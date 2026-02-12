@@ -57,13 +57,14 @@ class _MatchDetailView extends StatelessWidget {
             body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 SliverAppBar(
-                  expandedHeight: 200,
+                  expandedHeight: 250,
                   pinned: true,
                   flexibleSpace: FlexibleSpaceBar(
                     background: _MatchHeader(match: match),
                   ),
                   bottom: TabBar(
                     isScrollable: false,
+                    dividerColor: Colors.transparent,
                     tabs: const [
                       Tab(text: 'Summary'),
                       Tab(text: 'Scorecard'),
@@ -103,7 +104,7 @@ class _MatchHeader extends StatelessWidget {
             ? AppColors.darkCardGradient
             : AppColors.primaryGradient,
       ),
-      padding: const EdgeInsets.fromLTRB(20, 80, 20, 50),
+      padding: const EdgeInsets.fromLTRB(20, 60, 20, 40),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

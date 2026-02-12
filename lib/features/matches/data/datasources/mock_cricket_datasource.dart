@@ -626,7 +626,8 @@ class MockCricketDataSource implements CricketDataSource {
       id: 'p_virat',
       name: 'Virat Kohli',
       country: 'India',
-      imageUrl: '',
+      imageUrl:
+          'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/316600/316605.png',
       role: 'Batsman',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Medium',
@@ -679,7 +680,8 @@ class MockCricketDataSource implements CricketDataSource {
       id: 'p_rohit',
       name: 'Rohit Sharma',
       country: 'India',
-      imageUrl: '',
+      imageUrl:
+          'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/316500/316584.png',
       role: 'Batsman',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Off Break',
@@ -719,7 +721,8 @@ class MockCricketDataSource implements CricketDataSource {
       id: 'p_bumrah',
       name: 'Jasprit Bumrah',
       country: 'India',
-      imageUrl: '',
+      imageUrl:
+          'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/316400/316484.png',
       role: 'Bowler',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Fast',
@@ -754,7 +757,8 @@ class MockCricketDataSource implements CricketDataSource {
       id: 'p_gill',
       name: 'Shubman Gill',
       country: 'India',
-      imageUrl: '',
+      imageUrl:
+          'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/322600/322611.png',
       role: 'Batsman',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Off Break',
@@ -778,7 +782,8 @@ class MockCricketDataSource implements CricketDataSource {
       id: 'p_pant',
       name: 'Rishabh Pant',
       country: 'India',
-      imageUrl: '',
+      imageUrl:
+          'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/322600/322613.png',
       role: 'Wicket-keeper',
       battingStyle: 'Left Handed Bat',
       bowlingStyle: '',

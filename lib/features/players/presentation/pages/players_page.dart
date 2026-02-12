@@ -88,16 +88,26 @@ class _PlayerCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(14),
+                image: player.imageUrl.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(player.imageUrl),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
               alignment: Alignment.center,
-              child: Text(
-                player.name.isNotEmpty ? player.name[0].toUpperCase() : '?',
-                style: GoogleFonts.poppins(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryGreen,
-                ),
-              ),
+              child: player.imageUrl.isEmpty
+                  ? Text(
+                      player.name.isNotEmpty
+                          ? player.name[0].toUpperCase()
+                          : '?',
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryGreen,
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(width: 14),
             Expanded(

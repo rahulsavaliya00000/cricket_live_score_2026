@@ -87,6 +87,7 @@ class _SeriesDetailView extends StatelessWidget {
                     ),
                   ),
                   bottom: const TabBar(
+                    dividerColor: Colors.transparent,
                     tabs: [
                       Tab(text: 'Matches'),
                       Tab(text: 'Points Table'),

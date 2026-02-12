@@ -61,21 +61,30 @@ class _PlayerDetailView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Container(
-                          width: 80,
-                          height: 80,
+                          width: 100,
+                          height: 100,
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                            image: player.imageUrl.isNotEmpty
+                                ? DecorationImage(
+                                    image: NetworkImage(player.imageUrl),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
                           ),
                           alignment: Alignment.center,
-                          child: Text(
-                            player.name[0].toUpperCase(),
-                            style: GoogleFonts.poppins(
-                              fontSize: 36,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
+                          child: player.imageUrl.isEmpty
+                              ? Text(
+                                  player.name[0].toUpperCase(),
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 42,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : null,
                         ),
                         const SizedBox(height: 12),
                         Text(
