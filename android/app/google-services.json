@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "140223746923",
+    "project_id": "hack-the-tank",
+    "storage_bucket": "hack-the-tank.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140223746923:android:e52ecbab9a315ea765b22e",
+        "android_client_info": {
+          "package_name": "com.example.cricketbuzz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "140223746923-nplf6gemlr38vm9fq6eqsvg9rindfj7c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATPbh9RQf_peg77rlUoOmCtO-3fzSy4hQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140223746923-nplf6gemlr38vm9fq6eqsvg9rindfj7c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "140223746923-5iffle1ig0jjltj5ijc98acla312pfvb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.qdevix.audify"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140223746923:android:d8d27fbbd5972cd865b22e",
+        "android_client_info": {
+          "package_name": "com.qdevix.audify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "140223746923-nplf6gemlr38vm9fq6eqsvg9rindfj7c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATPbh9RQf_peg77rlUoOmCtO-3fzSy4hQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140223746923-nplf6gemlr38vm9fq6eqsvg9rindfj7c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "140223746923-5iffle1ig0jjltj5ijc98acla312pfvb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.qdevix.audify"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

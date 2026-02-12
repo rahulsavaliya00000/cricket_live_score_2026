@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>140223746923-7ck4saqtjb28cc22o0pe03fpjmh6e6om.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.140223746923-7ck4saqtjb28cc22o0pe03fpjmh6e6om</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>140223746923-15om8fotr173csrghjk7rai3dajesi2s.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD2d2wJLogsuiAgrrk51wN-_AuyTyWfiGI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>140223746923</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.cricketbuzz</string>
+	<key>PROJECT_ID</key>
+	<string>hack-the-tank</string>
+	<key>STORAGE_BUCKET</key>
+	<string>hack-the-tank.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:140223746923:ios:22fddf54192860c165b22e</string>
+</dict>
+</plist>
