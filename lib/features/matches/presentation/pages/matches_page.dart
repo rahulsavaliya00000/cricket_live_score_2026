@@ -7,6 +7,7 @@ import 'package:cricketbuzz/core/widgets/shimmer_loader.dart';
 import 'package:cricketbuzz/core/widgets/error_view.dart';
 import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
+import 'package:cricketbuzz/core/widgets/team_flag.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({super.key});
@@ -61,7 +62,6 @@ class _MatchesPageState extends State<MatchesPage>
             );
           }
           return TabBarView(
-            
             controller: _tabController,
             children: [
               _MatchList(
@@ -186,7 +186,7 @@ class _MatchCard extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                Text(match.team1.flagUrl, style: const TextStyle(fontSize: 18)),
+                TeamFlag(flagUrl: match.team1.flagUrl, size: 22),
                 const SizedBox(width: 8),
                 Text(
                   match.team1.shortName,
@@ -219,7 +219,7 @@ class _MatchCard extends StatelessWidget {
             const SizedBox(height: 6),
             Row(
               children: [
-                Text(match.team2.flagUrl, style: const TextStyle(fontSize: 18)),
+                TeamFlag(flagUrl: match.team2.flagUrl, size: 22),
                 const SizedBox(width: 8),
                 Text(
                   match.team2.shortName,

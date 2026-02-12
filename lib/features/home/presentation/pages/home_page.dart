@@ -9,6 +9,7 @@ import 'package:cricketbuzz/core/widgets/error_view.dart';
 import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
 import 'package:cricketbuzz/core/services/notification_service.dart';
+import 'package:cricketbuzz/core/widgets/team_flag.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -362,7 +363,7 @@ class _TeamScore extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(flag, style: const TextStyle(fontSize: 20)),
+        TeamFlag(flagUrl: flag, size: 24),
         const SizedBox(width: 10),
         Text(
           name,

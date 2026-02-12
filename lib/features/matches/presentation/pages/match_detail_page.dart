@@ -8,6 +8,7 @@ import 'package:cricketbuzz/core/widgets/error_view.dart';
 import 'package:cricketbuzz/core/widgets/shimmer_loader.dart';
 import 'package:cricketbuzz/features/matches/presentation/bloc/match_detail_bloc.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
+import 'package:cricketbuzz/core/widgets/team_flag.dart';
 
 class MatchDetailPage extends StatelessWidget {
   final String matchId;
@@ -195,8 +196,8 @@ class _HeaderTeam extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(flag, style: const TextStyle(fontSize: 28)),
-        const SizedBox(height: 4),
+        TeamFlag(flagUrl: flag, size: 40),
+        const SizedBox(height: 8),
         Text(
           name,
           style: GoogleFonts.poppins(
