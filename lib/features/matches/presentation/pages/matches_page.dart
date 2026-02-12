@@ -80,6 +80,7 @@ class _MatchesPageState extends State<MatchesPage>
           );
         },
       ),
+      bottomNavigationBar: _BannerAdPlaceholder(),
     );
   }
 }
@@ -188,11 +189,15 @@ class _MatchCard extends StatelessWidget {
               children: [
                 TeamFlag(flagUrl: match.team1.flagUrl, size: 22),
                 const SizedBox(width: 8),
-                Text(
-                  match.team1.shortName,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    match.team1.shortName,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const Spacer(),
@@ -203,14 +208,20 @@ class _MatchCard extends StatelessWidget {
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 if (match.team1.overs != null) ...[
                   const SizedBox(width: 4),
-                  Text(
-                    '(${match.team1.overs})',
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                      color: Theme.of(context).textTheme.bodySmall?.color,
+                  Flexible(
+                    child: Text(
+                      '(${match.team1.overs})',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -221,11 +232,15 @@ class _MatchCard extends StatelessWidget {
               children: [
                 TeamFlag(flagUrl: match.team2.flagUrl, size: 22),
                 const SizedBox(width: 8),
-                Text(
-                  match.team2.shortName,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    match.team2.shortName,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const Spacer(),
@@ -236,14 +251,20 @@ class _MatchCard extends StatelessWidget {
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 if (match.team2.overs != null) ...[
                   const SizedBox(width: 4),
-                  Text(
-                    '(${match.team2.overs})',
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                      color: Theme.of(context).textTheme.bodySmall?.color,
+                  Flexible(
+                    child: Text(
+                      '(${match.team2.overs})',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -265,6 +286,45 @@ class _MatchCard extends StatelessWidget {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BannerAdPlaceholder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: double.infinity,
+      height: 60,
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkCard : Colors.white,
+        border: Border(
+          top: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
+        ),
+      ),
+      child: Center(
+        child: Container(
+          width: 320,
+          height: 50,
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.grey[200],
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: const Center(
+            child: Text(
+              'BANNER AD PLACEHOLDER (320x50)',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
       ),
     );

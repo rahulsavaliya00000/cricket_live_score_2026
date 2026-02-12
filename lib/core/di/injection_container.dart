@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,7 +13,7 @@ import 'package:cricketbuzz/features/auth/domain/repositories/auth_repository.da
 import 'package:cricketbuzz/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
 import 'package:cricketbuzz/features/matches/data/datasources/cricket_datasource.dart';
-import 'package:cricketbuzz/features/matches/data/datasources/mock_cricket_datasource.dart';
+import 'package:cricketbuzz/features/matches/data/datasources/scraper_cricket_datasource.dart';
 import 'package:cricketbuzz/features/matches/data/repositories/cricket_repository.dart';
 import 'package:cricketbuzz/features/matches/presentation/bloc/match_detail_bloc.dart';
 import 'package:cricketbuzz/features/players/presentation/bloc/players_bloc.dart';
@@ -28,6 +29,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => FirebaseFirestore.instance);
   sl.registerLazySingleton(() => GoogleSignIn());
   sl.registerLazySingleton(() => Connectivity());
+  sl.registerLazySingleton(() => http.Client());
 
   // ─── Core ──────────────────────────────────────────────
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
@@ -49,8 +51,9 @@ Future<void> initDependencies() async {
   sl.registerFactory(() => AuthBloc(repository: sl()));
 
   // ─── Cricket Data ──────────────────────────────────────
-  // Swap MockCricketDataSource with real API/scraper implementation here
-  sl.registerLazySingleton<CricketDataSource>(() => MockCricketDataSource());
+  sl.registerLazySingleton<CricketDataSource>(
+    () => ScraperCricketDataSource(client: sl()),
+  );
   sl.registerLazySingleton<CricketRepository>(
     () => CricketRepositoryImpl(dataSource: sl()),
   );

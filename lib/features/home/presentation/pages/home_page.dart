@@ -135,6 +135,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
 
+                  // ─── Native Ad Placeholder ───────
+                  SliverToBoxAdapter(child: _NativeAdPlaceholder()),
+
                   // ─── Upcoming Matches ────────────
                   if (state.upcomingMatches.isNotEmpty) ...[
                     SliverToBoxAdapter(
@@ -270,6 +273,7 @@ class _LiveMatchCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -365,22 +369,41 @@ class _TeamScore extends StatelessWidget {
       children: [
         TeamFlag(flagUrl: flag, size: 24),
         const SizedBox(width: 10),
-        Text(
-          name,
-          style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600),
+        Expanded(
+          child: Text(
+            name,
+            style: GoogleFonts.poppins(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        const Spacer(),
-        Text(
-          score,
-          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700),
+        const SizedBox(width: 8),
+        Flexible(
+          flex: 0,
+          child: Text(
+            score,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         if (overs.isNotEmpty) ...[
-          const SizedBox(width: 6),
-          Text(
-            overs,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Theme.of(context).textTheme.bodySmall?.color,
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              overs,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -519,9 +542,109 @@ class _MatchListTile extends StatelessWidget {
     if (diff.inDays > 0) {
       return 'Starts in ${diff.inDays}d ${diff.inHours % 24}h';
     }
-    if (diff.inHours > 0) {
-      return 'Starts in ${diff.inHours}h ${diff.inMinutes % 60}m';
-    }
     return 'Starting soon';
+  }
+}
+
+class _NativeAdPlaceholder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: isDark ? Colors.white10 : Colors.black12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.accentGold.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'Ad',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.accentGold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Sponsored',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.shopping_bag_outlined,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Best Cricket Gear 2026',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Get up to 50% off on all cricket accessories.',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('Shop Now'),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

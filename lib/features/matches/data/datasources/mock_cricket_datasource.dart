@@ -576,6 +576,12 @@ class MockCricketDataSource implements CricketDataSource {
 
   // ─── Live Score Stream ───────────────────────────────────
   @override
+  Future<List<PointsTableEntry>> getSeriesStandings(String seriesId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    return [];
+  }
+
+  @override
   Stream<CricketMatch> getLiveScoreStream(String matchId) async* {
     while (true) {
       await Future.delayed(const Duration(seconds: 15));

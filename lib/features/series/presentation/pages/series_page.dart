@@ -32,6 +32,29 @@ class _SeriesPageState extends State<SeriesPage> {
           'Series',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: TextField(
+              onChanged: (value) =>
+                  context.read<SeriesBloc>().add(SearchSeries(value)),
+              decoration: InputDecoration(
+                hintText: 'Search series...',
+                prefixIcon: const Icon(Icons.search_rounded),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.05),
+              ),
+            ),
+          ),
+        ),
       ),
       body: BlocBuilder<SeriesBloc, SeriesState>(
         builder: (context, state) {
@@ -45,11 +68,22 @@ class _SeriesPageState extends State<SeriesPage> {
               onRetry: () => context.read<SeriesBloc>().add(LoadSeries()),
             );
           }
+          final seriesList = state.filteredSeries;
+          if (seriesList.isEmpty && state.status == SeriesStatus.loaded) {
+            return Center(
+              child: Text(
+                'No series found',
+                style: GoogleFonts.poppins(
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                ),
+              ),
+            );
+          }
           return ListView.builder(
             padding: const EdgeInsets.all(12),
-            itemCount: state.seriesList.length,
+            itemCount: seriesList.length,
             itemBuilder: (context, index) {
-              return _SeriesCard(series: state.seriesList[index]);
+              return _SeriesCard(series: seriesList[index]);
             },
           );
         },

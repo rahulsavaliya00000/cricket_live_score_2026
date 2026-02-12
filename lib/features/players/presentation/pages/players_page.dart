@@ -32,6 +32,29 @@ class _PlayersPageState extends State<PlayersPage> {
           'Players',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: TextField(
+              onChanged: (value) =>
+                  context.read<PlayersBloc>().add(SearchPlayers(value)),
+              decoration: InputDecoration(
+                hintText: 'Search players or countries...',
+                prefixIcon: const Icon(Icons.search_rounded),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.05),
+              ),
+            ),
+          ),
+        ),
       ),
       body: BlocBuilder<PlayersBloc, PlayersState>(
         builder: (context, state) {
@@ -44,11 +67,22 @@ class _PlayersPageState extends State<PlayersPage> {
               onRetry: () => context.read<PlayersBloc>().add(LoadPlayers()),
             );
           }
+          final players = state.filteredPlayers;
+          if (players.isEmpty && state.status == PlayersStatus.loaded) {
+            return Center(
+              child: Text(
+                'No players found',
+                style: GoogleFonts.poppins(
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                ),
+              ),
+            );
+          }
           return ListView.builder(
             padding: const EdgeInsets.all(12),
-            itemCount: state.players.length,
+            itemCount: players.length,
             itemBuilder: (context, index) {
-              final player = state.players[index];
+              final player = players[index];
               return _PlayerCard(player: player);
             },
           );
@@ -97,16 +131,20 @@ class _PlayerCard extends StatelessWidget {
               ),
               alignment: Alignment.center,
               child: player.imageUrl.isEmpty
-                  ? Text(
-                      player.name.isNotEmpty
-                          ? player.name[0].toUpperCase()
-                          : '?',
-                      style: GoogleFonts.poppins(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryGreen,
-                      ),
-                    )
+                  ? (player.name.trim().isNotEmpty
+                        ? Text(
+                            player.name.trim()[0].toUpperCase(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryGreen,
+                            ),
+                          )
+                        : Icon(
+                            Icons.person_rounded,
+                            size: 28,
+                            color: AppColors.primaryGreen,
+                          ))
                   : null,
             ),
             const SizedBox(width: 14),
@@ -115,19 +153,25 @@ class _PlayerCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    player.name,
+                    player.name.trim().isNotEmpty
+                        ? player.name
+                        : 'Unknown Player',
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${player.country} • ${player.role}',
+                    '${player.country.trim().isNotEmpty ? player.country : 'Unknown Country'} • ${player.role}',
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

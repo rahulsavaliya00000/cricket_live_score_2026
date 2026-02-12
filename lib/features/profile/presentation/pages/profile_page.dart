@@ -113,37 +113,7 @@ class ProfilePage extends StatelessWidget {
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(
-                              'Coming Soon',
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            content: Text(
-                              'Premium features are currently under development. Stay tuned!',
-                              style: GoogleFonts.poppins(),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text(
-                                  'OK',
-                                  style: GoogleFonts.poppins(
-                                    color: AppColors.primaryGreen,
-                                  ),
-                                ),
-                              ),
-                            ],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                        );
-                      },
+                      onTap: () => context.push('/premium'),
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
                         padding: const EdgeInsets.all(18),
@@ -314,16 +284,22 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: _languageMap.entries.map((e) {
-              return RadioListTile<String>(
+              return ListTile(
                 title: Text(e.value, style: GoogleFonts.poppins()),
-                value: e.key,
-                groupValue: currentLocale.languageCode,
-                activeColor: AppColors.primaryGreen,
-                onChanged: (val) {
-                  if (val != null) {
-                    context.read<ThemeBloc>().add(ChangeLocale(Locale(val)));
-                    Navigator.pop(context);
-                  }
+                leading: Radio<String>(
+                  value: e.key,
+                  groupValue: currentLocale.languageCode,
+                  activeColor: AppColors.primaryGreen,
+                  onChanged: (val) {
+                    if (val != null) {
+                      context.read<ThemeBloc>().add(ChangeLocale(Locale(val)));
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+                onTap: () {
+                  context.read<ThemeBloc>().add(ChangeLocale(Locale(e.key)));
+                  Navigator.pop(context);
                 },
               );
             }).toList(),

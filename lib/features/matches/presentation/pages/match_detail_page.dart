@@ -158,6 +158,7 @@ class _MatchHeader extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               match.statusText!,
+              textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -169,6 +170,7 @@ class _MatchHeader extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               match.result!,
+              textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

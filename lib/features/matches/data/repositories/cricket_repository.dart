@@ -13,6 +13,7 @@ abstract class CricketRepository {
   Future<Player> getPlayerDetail(String playerId);
   Future<List<Series>> getSeries();
   Future<Series> getSeriesDetail(String seriesId);
+  Future<List<PointsTableEntry>> getSeriesStandings(String seriesId);
   Stream<CricketMatch> getLiveScoreStream(String matchId);
 }
 
@@ -53,6 +54,10 @@ class CricketRepositoryImpl implements CricketRepository {
   @override
   Future<Series> getSeriesDetail(String seriesId) =>
       dataSource.getSeriesDetail(seriesId);
+
+  @override
+  Future<List<PointsTableEntry>> getSeriesStandings(String seriesId) =>
+      dataSource.getSeriesStandings(seriesId);
 
   @override
   Stream<CricketMatch> getLiveScoreStream(String matchId) =>

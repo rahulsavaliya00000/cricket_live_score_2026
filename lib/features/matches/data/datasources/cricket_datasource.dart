@@ -14,5 +14,6 @@ abstract class CricketDataSource {
   Future<Player> getPlayerDetail(String playerId);
   Future<List<Series>> getSeries();
   Future<Series> getSeriesDetail(String seriesId);
+  Future<List<PointsTableEntry>> getSeriesStandings(String seriesId);
   Stream<CricketMatch> getLiveScoreStream(String matchId);
 }
