@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -19,17 +20,29 @@ class MatchesPage extends StatefulWidget {
 class _MatchesPageState extends State<MatchesPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  Timer? _autoRefreshTimer;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _startAutoRefresh();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _autoRefreshTimer?.cancel();
     super.dispose();
+  }
+
+  void _startAutoRefresh() {
+    // Auto-refresh every 30 seconds
+    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (mounted) {
+        context.read<HomeBloc>().add(RefreshHomeData());
+      }
+    });
   }
 
   @override

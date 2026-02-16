@@ -9,9 +9,13 @@ class ScraperCricketDataSource implements CricketDataSource {
   final http.Client client;
   final String _baseUrl = 'https://www.cricbuzz.com';
   final String _mBaseUrl = 'https://m.cricbuzz.com';
-  final Map<String, String> _headers = {
+
+  Map<String, String> get _headers => {
     'User-Agent':
         'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
   };
 
   ScraperCricketDataSource({required this.client});
@@ -269,15 +273,40 @@ class ScraperCricketDataSource implements CricketDataSource {
         String title = 'Unknown Match',
             team1Name = 'Team 1',
             team2Name = 'Team 2';
+        String team1Flag = '', team2Flag = '';
         String? score1, score2, statusText;
+
+        // Extract flag images and team names from alt attributes
+        final images = card.querySelectorAll('img');
+        if (images.length >= 2) {
+          team1Flag = images[0].attributes['src'] ?? '';
+          team2Flag = images[1].attributes['src'] ?? '';
+
+          // Try to get team names from image alt text (more reliable)
+          final alt1 = images[0].attributes['alt'] ?? '';
+          final alt2 = images[1].attributes['alt'] ?? '';
+          if (alt1.isNotEmpty && !alt1.contains('logo'))
+            team1Name = alt1.trim();
+          if (alt2.isNotEmpty && !alt2.contains('logo'))
+            team2Name = alt2.trim();
+
+          // Make URLs absolute if they're relative
+          if (team1Flag.startsWith('/')) team1Flag = _baseUrl + team1Flag;
+          if (team2Flag.startsWith('/')) team2Flag = _baseUrl + team2Flag;
+        }
 
         if (spans.isNotEmpty) {
           statusText = spans.last.text.trim();
+
+          // Find team names from spans if not found in alt text
           final teamCandidates = spans.where((s) {
             final t = s.text.trim().toLowerCase();
-            if (t.contains('•') || t.contains('/') || t.length < 2)
+            if (t.isEmpty || t.length < 2) return false;
+            if (t.contains('•') || t.contains('/')) return false;
+            if (RegExp(r'^\d+[-–—]\d+$|^\d+/\d+$').hasMatch(t)) return false;
+            if (RegExp(r'^\(\d+\.?\d*\s*(ov|overs)\)$').hasMatch(t))
               return false;
-            if (RegExp(r'\d+[-–—]\d+|\d+/\d+').hasMatch(t)) return false;
+
             final statusKeywords = [
               'need',
               'runs',
@@ -293,20 +322,29 @@ class ScraperCricketDataSource implements CricketDataSource {
               'opted',
               'choose',
               'toss',
+              'match',
+              'vs',
             ];
             if (statusKeywords.any((kw) => t.contains(kw))) return false;
             if (t == spans.last.text.trim().toLowerCase()) return false;
-            return true;
+
+            // Must be a reasonable length for a team name
+            return t.length >= 2 && t.length <= 30;
           }).toList();
 
+          // Only override if we didn't get names from alt text
           if (teamCandidates.isNotEmpty) {
-            team1Name = teamCandidates[0].text.trim();
-            if (teamCandidates.length >= 2)
+            if (team1Name == 'Team 1') {
+              team1Name = teamCandidates[0].text.trim();
+            }
+            if (teamCandidates.length >= 2 && team2Name == 'Team 2') {
               team2Name = teamCandidates[1].text.trim();
+            }
           }
 
+          // Extract scores
           final scoreCandidates = spans
-              .where((s) => RegExp(r'\d+-\d+|\d+/\d+').hasMatch(s.text))
+              .where((s) => RegExp(r'\d+[-–—]\d+|\d+/\d+').hasMatch(s.text))
               .toList();
           if (scoreCandidates.isNotEmpty) {
             score1 = scoreCandidates[0].text.trim();
@@ -335,17 +373,15 @@ class ScraperCricketDataSource implements CricketDataSource {
           team1: Team(
             id: team1Name,
             name: team1Name,
-            shortName: team1Name
-                .substring(0, team1Name.length >= 3 ? 3 : team1Name.length)
-                .toUpperCase(),
+            shortName: _getTeamShortName(team1Name),
+            flagUrl: team1Flag,
             score: score1,
           ),
           team2: Team(
             id: team2Name,
             name: team2Name,
-            shortName: team2Name
-                .substring(0, team2Name.length >= 3 ? 3 : team2Name.length)
-                .toUpperCase(),
+            shortName: _getTeamShortName(team2Name),
+            flagUrl: team2Flag,
             score: score2,
           ),
           statusText: statusText,
@@ -373,6 +409,8 @@ class ScraperCricketDataSource implements CricketDataSource {
             id: 'MI',
             name: 'Mumbai Indians',
             shortName: 'MI',
+            flagUrl:
+                'https://www.cricbuzz.com/a/img/v1/75x75/i1/c170661/mumbai-indians.jpg',
             score: '178/4',
             overs: '18.2',
           ),
@@ -380,6 +418,8 @@ class ScraperCricketDataSource implements CricketDataSource {
             id: 'CSK',
             name: 'Chennai Super Kings',
             shortName: 'CSK',
+            flagUrl:
+                'https://www.cricbuzz.com/a/img/v1/75x75/i1/c170623/chennai-super-kings.jpg',
             score: '175/8',
             overs: '20.0',
           ),
@@ -422,6 +462,87 @@ class ScraperCricketDataSource implements CricketDataSource {
         endDate: 'Jun 29',
       ),
     ];
+  }
+
+  /// Get proper short name for a team based on common cricket team abbreviations
+  String _getTeamShortName(String fullName) {
+    if (fullName.isEmpty) return 'TBD';
+
+    // Known team mappings
+    final knownTeams = {
+      'india': 'IND',
+      'australia': 'AUS',
+      'england': 'ENG',
+      'pakistan': 'PAK',
+      'south africa': 'SA',
+      'new zealand': 'NZ',
+      'sri lanka': 'SL',
+      'west indies': 'WI',
+      'bangladesh': 'BAN',
+      'afghanistan': 'AFG',
+      'zimbabwe': 'ZIM',
+      'ireland': 'IRE',
+      'netherlands': 'NED',
+      'scotland': 'SCO',
+      'united arab emirates': 'UAE',
+      'uae': 'UAE',
+      'mumbai indians': 'MI',
+      'chennai super kings': 'CSK',
+      'royal challengers bangalore': 'RCB',
+      'royal challengers bengaluru': 'RCB',
+      'kolkata knight riders': 'KKR',
+      'delhi capitals': 'DC',
+      'punjab kings': 'PBKS',
+      'rajasthan royals': 'RR',
+      'sunrisers hyderabad': 'SRH',
+      'lucknow super giants': 'LSG',
+      'gujarat titans': 'GT',
+      'namibia': 'NAM',
+      'oman': 'OMA',
+      'qatar': 'QAT',
+      'kenya': 'KEN',
+      'hong kong': 'HKG',
+      'nepal': 'NEP',
+      'canada': 'CAN',
+      'usa': 'USA',
+      'united states': 'USA',
+    };
+
+    final lowerName = fullName.toLowerCase().trim();
+
+    // Check if it's a known team
+    if (knownTeams.containsKey(lowerName)) {
+      return knownTeams[lowerName]!;
+    }
+
+    // Remove common suffixes
+    String cleanName = fullName
+        .replaceAll(
+          RegExp(r'\s+(women|men|u19|u-19)$', caseSensitive: false),
+          '',
+        )
+        .trim();
+
+    // If it contains multiple words, create abbreviation from first letters
+    final words = cleanName.split(RegExp(r'\s+'));
+    if (words.length >= 2) {
+      // Take first letter of each significant word (skip "the", "of", etc.)
+      final skipWords = {'the', 'of', 'and', '&'};
+      final abbreviation = words
+          .where((word) => !skipWords.contains(word.toLowerCase()))
+          .map((word) => word.isNotEmpty ? word[0].toUpperCase() : '')
+          .join();
+      if (abbreviation.length >= 2) {
+        return abbreviation.substring(
+          0,
+          abbreviation.length > 4 ? 4 : abbreviation.length,
+        );
+      }
+    }
+
+    // Fallback: take first 3-4 characters
+    final maxLen = fullName.length >= 4 ? 4 : fullName.length;
+    return fullName.substring(0, maxLen >= 3 ? 3 : maxLen).toUpperCase();
   }
 
   MatchFormat _guessFormat(String title) {

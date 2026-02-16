@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -19,16 +20,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Timer? _autoRefreshTimer;
+
   @override
   void initState() {
     super.initState();
     context.read<HomeBloc>().add(LoadHomeData());
     _requestNotificationPermissions();
+    _startAutoRefresh();
+  }
+
+  @override
+  void dispose() {
+    _autoRefreshTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startAutoRefresh() {
+    // Auto-refresh every 30 seconds
+    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (mounted) {
+        context.read<HomeBloc>().add(RefreshHomeData());
+      }
+    });
   }
 
   Future<void> _requestNotificationPermissions() async {
     // Delay request by 5 seconds to ensure app is loaded and user is settled
-    await Future.delayed(const Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 10));
     if (mounted) {
       // We use the singleton instance directly or via DI if available.
       // Since it's a singleton, this is fine.

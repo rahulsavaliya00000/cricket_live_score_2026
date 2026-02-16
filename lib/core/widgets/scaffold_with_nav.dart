@@ -5,7 +5,14 @@ class ScaffoldWithNav extends StatelessWidget {
   final Widget child;
   const ScaffoldWithNav({super.key, required this.child});
 
-  static const _tabs = ['/home', '/matches', '/series', '/players', '/profile'];
+  static const _tabs = [
+    '/home',
+    '/matches',
+    '/series',
+    '/players',
+    '/browser',
+    '/profile',
+  ];
 
   int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
@@ -48,6 +55,11 @@ class ScaffoldWithNav extends StatelessWidget {
               'Series',
             ),
             _navItem(Icons.people_rounded, Icons.people_outlined, 'Players'),
+            _navItem(
+              Icons.language_rounded,
+              Icons.language_outlined,
+              'Browser',
+            ),
             _navItem(Icons.person_rounded, Icons.person_outlined, 'Profile'),
           ],
         ),
