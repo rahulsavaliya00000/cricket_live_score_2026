@@ -14,7 +14,7 @@ class BrowserPage extends StatefulWidget {
 class _BrowserPageState extends State<BrowserPage> {
   late final WebViewController _controller;
   bool _isLoading = true;
-  String _currentUrl = 'https://m.cricbuzz.com/live-cricket-scores';
+  String _currentUrl = 'https://crex.com'; // Crex for faster updates!
   Timer? _autoRefreshTimer;
 
   @override

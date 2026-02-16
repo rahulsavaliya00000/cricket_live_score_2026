@@ -38,16 +38,21 @@ class _HomePageState extends State<HomePage> {
 
   void _startAutoRefresh() {
     // Auto-refresh every 30 seconds
+    print('🔄 Auto-refresh timer started - will refresh every 30 seconds');
     _autoRefreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       if (mounted) {
+        print('🔄 Auto-refresh triggered at ${DateTime.now()}');
         context.read<HomeBloc>().add(RefreshHomeData());
+      } else {
+        print('⚠️ Widget not mounted, canceling timer');
+        timer.cancel();
       }
     });
   }
 
   Future<void> _requestNotificationPermissions() async {
     // Delay request by 5 seconds to ensure app is loaded and user is settled
-    await Future.delayed(const Duration(seconds: 10));
+    await Future.delayed(const Duration(seconds: 5));
     if (mounted) {
       // We use the singleton instance directly or via DI if available.
       // Since it's a singleton, this is fine.
@@ -85,7 +90,7 @@ class _HomePageState extends State<HomePage> {
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<HomeBloc>().add(RefreshHomeData());
-                await Future.delayed(const Duration(seconds: 1));
+                await Future.delayed(const Duration(seconds: 5));
               },
               color: AppColors.primaryGreen,
               child: CustomScrollView(
@@ -293,39 +298,7 @@ class _LiveMatchCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.liveGradient,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'LIVE',
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _StatusBadge(match: match),
                 ],
               ),
               const SizedBox(height: 14),
@@ -369,6 +342,100 @@ class _LiveMatchCard extends StatelessWidget {
   }
 }
 
+class _StatusBadge extends StatelessWidget {
+  final CricketMatch match;
+  const _StatusBadge({required this.match});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (match.status) {
+      case MatchStatus.live:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            gradient: AppColors.liveGradient,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'LIVE',
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        );
+      case MatchStatus.upcoming:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: Colors.blueGrey.shade100,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.schedule_rounded,
+                size: 12,
+                color: Colors.blueGrey,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'UPCOMING',
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.blueGrey,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        );
+      case MatchStatus.completed:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: Colors.green.shade100,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle, size: 12, color: Colors.green),
+              const SizedBox(width: 4),
+              Text(
+                'RESULT',
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.green,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        );
+    }
+  }
+}
+
 class _TeamScore extends StatelessWidget {
   final String flag;
   final String name;
@@ -399,31 +466,23 @@ class _TeamScore extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(width: 8),
-        Flexible(
-          flex: 0,
-          child: Text(
-            score,
+        const SizedBox(width: 12), // Increased spacing
+        Text(
+          score,
+          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (overs.isNotEmpty) ...[
+          const SizedBox(width: 6), // Increased spacing
+          Text(
+            overs,
             style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
+              fontSize: 12,
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        if (overs.isNotEmpty) ...[
-          const SizedBox(width: 4),
-          Flexible(
-            child: Text(
-              overs,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: Theme.of(context).textTheme.bodySmall?.color,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
           ),
         ],
       ],
