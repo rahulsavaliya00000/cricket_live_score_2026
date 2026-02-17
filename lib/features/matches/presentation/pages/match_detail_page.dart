@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,9 +24,41 @@ class MatchDetailPage extends StatelessWidget {
   }
 }
 
-class _MatchDetailView extends StatelessWidget {
+class _MatchDetailView extends StatefulWidget {
   final String matchId;
   const _MatchDetailView({required this.matchId});
+
+  @override
+  State<_MatchDetailView> createState() => _MatchDetailViewState();
+}
+
+class _MatchDetailViewState extends State<_MatchDetailView> {
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startRefreshTimer();
+    // Subscribe to live score stream for real-time updates
+    context.read<MatchDetailBloc>().add(SubscribeToLiveScore(widget.matchId));
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startRefreshTimer() {
+    // Refresh every 5 seconds for live matches
+    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (mounted) {
+        context.read<MatchDetailBloc>().add(RefreshMatchDetail(widget.matchId));
+      } else {
+        timer.cancel();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +76,9 @@ class _MatchDetailView extends StatelessWidget {
             appBar: AppBar(title: const Text('Match Details')),
             body: ErrorView(
               message: state.error ?? 'Failed to load match details',
-              onRetry: () =>
-                  context.read<MatchDetailBloc>().add(LoadMatchDetail(matchId)),
+              onRetry: () => context.read<MatchDetailBloc>().add(
+                LoadMatchDetail(widget.matchId),
+              ),
             ),
           );
         }
@@ -70,7 +104,7 @@ class _MatchDetailView extends StatelessWidget {
                       Tab(text: 'Summary'),
                       Tab(text: 'Scorecard'),
                       Tab(text: 'Commentary'),
-                      Tab(text: 'Stats'),
+                      Tab(text: 'Info'),
                     ],
                   ),
                 ),
@@ -80,7 +114,13 @@ class _MatchDetailView extends StatelessWidget {
                   _SummaryTab(detail: detail),
                   _ScorecardTab(innings: detail.innings),
                   _CommentaryTab(commentary: detail.commentary),
-                  _StatsTab(stats: detail.stats),
+                  _StatsTab(
+                    stats: detail.stats,
+                    playingXI1: detail.playingXI1,
+                    playingXI2: detail.playingXI2,
+                    team1Name: detail.match.team1.name,
+                    team2Name: detail.match.team2.name,
+                  ),
                 ],
               ),
             ),
@@ -250,14 +290,18 @@ class _SummaryTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      inn.teamName,
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        inn.teamName,
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(width: 8),
                     Text(
                       '${inn.scoreText} ${inn.oversText}',
                       style: GoogleFonts.poppins(
@@ -761,22 +805,94 @@ class _CommentaryTab extends StatelessWidget {
 // ─── Stats Tab ──────────────────────────────────────────
 class _StatsTab extends StatelessWidget {
   final MatchStats? stats;
-  const _StatsTab({this.stats});
+  final List<String> playingXI1;
+  final List<String> playingXI2;
+  final String team1Name;
+  final String team2Name;
+
+  const _StatsTab({
+    this.stats,
+    this.playingXI1 = const [],
+    this.playingXI2 = const [],
+    this.team1Name = 'Team 1',
+    this.team2Name = 'Team 2',
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (stats == null) {
-      return const Center(child: Text('No stats available'));
-    }
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _StatRow('Total Fours', '${stats!.totalFours}'),
-        _StatRow('Total Sixes', '${stats!.totalSixes}'),
-        _StatRow('Total Dot Balls', '${stats!.totalDotBalls}'),
-        _StatRow('Highest Run Rate', stats!.highestRunRate.toStringAsFixed(2)),
-        _StatRow('Highest Score', stats!.highestScore),
-        _StatRow('Best Bowling', stats!.bestBowling),
+        if (playingXI1.isNotEmpty) ...[
+          Text(
+            "$team1Name's Playing XI",
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: playingXI1.map((name) {
+              return Chip(
+                label: Text(name, style: GoogleFonts.poppins(fontSize: 12)),
+                backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
+                side: const BorderSide(
+                  color: AppColors.primaryGreen,
+                  width: 0.5,
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+        ],
+        if (playingXI2.isNotEmpty) ...[
+          Text(
+            "$team2Name's Playing XI",
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: playingXI2.map((name) {
+              return Chip(
+                label: Text(name, style: GoogleFonts.poppins(fontSize: 12)),
+                backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
+                side: const BorderSide(
+                  color: AppColors.primaryGreen,
+                  width: 0.5,
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+        ],
+        if (stats != null) ...[
+          Text(
+            'Match Statistics',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _StatRow('Total Fours', '${stats!.totalFours}'),
+          _StatRow('Total Sixes', '${stats!.totalSixes}'),
+          _StatRow('Total Dot Balls', '${stats!.totalDotBalls}'),
+          _StatRow(
+            'Highest Run Rate',
+            stats!.highestRunRate.toStringAsFixed(2),
+          ),
+          _StatRow('Highest Score', stats!.highestScore),
+          _StatRow('Best Bowling', stats!.bestBowling),
+        ] else if (playingXI1.isEmpty && playingXI2.isEmpty && stats == null)
+          const Center(child: Text('No information available')),
       ],
     );
   }

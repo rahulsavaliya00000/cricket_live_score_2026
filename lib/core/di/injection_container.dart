@@ -13,7 +13,7 @@ import 'package:cricketbuzz/features/auth/domain/repositories/auth_repository.da
 import 'package:cricketbuzz/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
 import 'package:cricketbuzz/features/matches/data/datasources/cricket_datasource.dart';
-import 'package:cricketbuzz/features/matches/data/datasources/crex_datasource.dart';
+import 'package:cricketbuzz/features/matches/data/datasources/scraper_cricket_datasource.dart';
 import 'package:cricketbuzz/features/matches/data/repositories/cricket_repository.dart';
 import 'package:cricketbuzz/features/matches/presentation/bloc/match_detail_bloc.dart';
 import 'package:cricketbuzz/features/players/presentation/bloc/players_bloc.dart';
@@ -52,7 +52,7 @@ Future<void> initDependencies() async {
 
   // ─── Cricket Data ──────────────────────────────────────
   sl.registerLazySingleton<CricketDataSource>(
-    () => CrexDataSource(client: sl()), // Using Crex for faster updates!
+    () => ScraperCricketDataSource(client: sl()),
   );
   sl.registerLazySingleton<CricketRepository>(
     () => CricketRepositoryImpl(dataSource: sl()),

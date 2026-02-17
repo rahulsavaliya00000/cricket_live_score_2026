@@ -1,6 +1,7 @@
 import 'package:cricketbuzz/features/matches/data/datasources/cricket_datasource.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
 import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart';
+import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
 
 abstract class CricketRepository {
@@ -9,11 +10,11 @@ abstract class CricketRepository {
   Future<List<CricketMatch>> getRecentMatches();
   Future<MatchDetail> getMatchDetail(String matchId);
   Future<List<BallCommentary>> getCommentary(String matchId);
-  Future<List<Player>> getPlayers();
-  Future<Player> getPlayerDetail(String playerId);
+  Future<List<CricketTeam>> getTeams();
+  Future<List<Player>> getTeamPlayers(String teamSlug, String teamId);
+  Future<Player> getPlayerDetail(String id, String slug);
   Future<List<Series>> getSeries();
   Future<Series> getSeriesDetail(String seriesId);
-  Future<List<PointsTableEntry>> getSeriesStandings(String seriesId);
   Stream<CricketMatch> getLiveScoreStream(String matchId);
 }
 
@@ -42,11 +43,15 @@ class CricketRepositoryImpl implements CricketRepository {
       dataSource.getCommentary(matchId);
 
   @override
-  Future<List<Player>> getPlayers() => dataSource.getPlayers();
+  Future<List<CricketTeam>> getTeams() => dataSource.getTeams();
 
   @override
-  Future<Player> getPlayerDetail(String playerId) =>
-      dataSource.getPlayerDetail(playerId);
+  Future<List<Player>> getTeamPlayers(String teamSlug, String teamId) =>
+      dataSource.getTeamPlayers(teamSlug, teamId);
+
+  @override
+  Future<Player> getPlayerDetail(String id, String slug) =>
+      dataSource.getPlayerDetail(id, slug);
 
   @override
   Future<List<Series>> getSeries() => dataSource.getSeries();
@@ -54,10 +59,6 @@ class CricketRepositoryImpl implements CricketRepository {
   @override
   Future<Series> getSeriesDetail(String seriesId) =>
       dataSource.getSeriesDetail(seriesId);
-
-  @override
-  Future<List<PointsTableEntry>> getSeriesStandings(String seriesId) =>
-      dataSource.getSeriesStandings(seriesId);
 
   @override
   Stream<CricketMatch> getLiveScoreStream(String matchId) =>

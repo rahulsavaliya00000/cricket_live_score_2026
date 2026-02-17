@@ -21,6 +21,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Timer? _autoRefreshTimer;
+  MatchCategory _selectedCategory = MatchCategory.all;
 
   @override
   void initState() {
@@ -37,9 +38,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _startAutoRefresh() {
-    // Auto-refresh every 30 seconds
-    print('🔄 Auto-refresh timer started - will refresh every 30 seconds');
-    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    // Auto-refresh every 5 seconds
+    print('🔄 Auto-refresh timer started - will refresh every 5 seconds');
+    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 15), (timer) {
       if (mounted) {
         print('🔄 Auto-refresh triggered at ${DateTime.now()}');
         context.read<HomeBloc>().add(RefreshHomeData());
@@ -51,24 +52,57 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _requestNotificationPermissions() async {
-    // Delay request by 5 seconds to ensure app is loaded and user is settled
-    await Future.delayed(const Duration(seconds: 5));
-    if (mounted) {
-      // We use the singleton instance directly or via DI if available.
-      // Since it's a singleton, this is fine.
-      // Ideally getting it from SL would be cleaner but for now consistent with main.dart usage pattern (or lack thereof, since main created it).
-      // Actually main.dart created it but it's a singleton with factory.
+    await Future.delayed(const Duration(seconds: 3));
+    if (!mounted) return;
 
-      /* 
-       Wait, in main.dart:
-       final notificationService = NotificationService();
-       factory NotificationService() => _instance;
-       So new NotificationService() returns the singleton.
-       */
+    final notificationService = NotificationService();
+    final granted = await notificationService.requestAndCheckPermissions();
 
-      final notificationService = NotificationService(); // Gets singleton
-      await notificationService.requestPermissions();
+    if (!granted && mounted) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(
+            'Enable Notifications 🔔',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
+          content: Text(
+            'Stay updated with live match scores and daily cricket alerts! Please enable notifications in your device settings.',
+            style: GoogleFonts.poppins(fontSize: 13),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(
+                'Later',
+                style: GoogleFonts.poppins(color: Colors.grey),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                notificationService.openAppSettings();
+              },
+              child: Text(
+                'Open Settings',
+                style: GoogleFonts.poppins(
+                  color: AppColors.primaryGreen,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     }
+  }
+
+  List<CricketMatch> _filter(List<CricketMatch> matches) {
+    if (_selectedCategory == MatchCategory.all) return matches;
+    return matches.where((m) => _selectedCategory.matches(m)).toList();
   }
 
   @override
@@ -87,6 +121,12 @@ class _HomePageState extends State<HomePage> {
                 onRetry: () => context.read<HomeBloc>().add(LoadHomeData()),
               );
             }
+
+            // Apply filters
+            final liveMatches = _filter(state.liveMatches);
+            final upcomingMatches = _filter(state.upcomingMatches);
+            final recentMatches = _filter(state.recentMatches);
+
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<HomeBloc>().add(RefreshHomeData());
@@ -98,31 +138,107 @@ class _HomePageState extends State<HomePage> {
                   // ─── App Bar ─────────────────────
                   SliverAppBar(
                     floating: true,
-                    title: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGreen.withValues(
-                              alpha: 0.1,
+                    pinned: true,
+                    title: PopupMenuButton<MatchCategory>(
+                      useRootNavigator: true,
+                      onSelected: (category) =>
+                          setState(() => _selectedCategory = category),
+                      itemBuilder: (context) => MatchCategory.values
+                          .map(
+                            (cat) => PopupMenuItem(
+                              value: cat,
+                              child: Row(
+                                children: [
+                                  if (_selectedCategory == cat)
+                                    const Icon(
+                                      Icons.check_rounded,
+                                      color: AppColors.primaryGreen,
+                                      size: 18,
+                                    )
+                                  else
+                                    const SizedBox(width: 18),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    cat.label,
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: _selectedCategory == cat
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
+                                      color: _selectedCategory == cat
+                                          ? AppColors.primaryGreen
+                                          : null,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            borderRadius: BorderRadius.circular(8),
+                          )
+                          .toList(),
+                      offset: const Offset(0, 40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGreen.withValues(
+                                alpha: 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.sports_cricket_rounded,
+                              color: AppColors.primaryGreen,
+                              size: 22,
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.sports_cricket_rounded,
-                            color: AppColors.primaryGreen,
-                            size: 22,
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'CricketBuzz',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.keyboard_arrow_down_rounded,
+                                    size: 20,
+                                    color: Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge?.color,
+                                  ),
+                                ],
+                              ),
+                              if (_selectedCategory != MatchCategory.all)
+                                Text(
+                                  _selectedCategory.label,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 10,
+                                    color: AppColors.primaryGreen,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                )
+                              else if (state.isRefreshing)
+                                Text(
+                                  'Updating scores...',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 10,
+                                    color: AppColors.primaryGreen,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          'CricketBuzz',
-                          style: GoogleFonts.poppins(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     actions: [
                       IconButton(
@@ -130,10 +246,22 @@ class _HomePageState extends State<HomePage> {
                         icon: const Icon(Icons.settings_outlined, size: 22),
                       ),
                     ],
+                    bottom: PreferredSize(
+                      preferredSize: const Size.fromHeight(2),
+                      child: state.isRefreshing
+                          ? const LinearProgressIndicator(
+                              minHeight: 2,
+                              backgroundColor: Colors.transparent,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.primaryGreen,
+                              ),
+                            )
+                          : const SizedBox(height: 2),
+                    ),
                   ),
 
                   // ─── Live Matches Carousel ───────
-                  if (state.liveMatches.isNotEmpty) ...[
+                  if (liveMatches.isNotEmpty) ...[
                     SliverToBoxAdapter(
                       child: _SectionHeader(
                         title: 'Live Matches',
@@ -148,11 +276,9 @@ class _HomePageState extends State<HomePage> {
                         height: 180,
                         child: PageView.builder(
                           controller: PageController(viewportFraction: 0.92),
-                          itemCount: state.liveMatches.length,
+                          itemCount: liveMatches.length,
                           itemBuilder: (context, index) {
-                            return _LiveMatchCard(
-                              match: state.liveMatches[index],
-                            );
+                            return _LiveMatchCard(match: liveMatches[index]);
                           },
                         ),
                       ),
@@ -163,7 +289,7 @@ class _HomePageState extends State<HomePage> {
                   SliverToBoxAdapter(child: _NativeAdPlaceholder()),
 
                   // ─── Upcoming Matches ────────────
-                  if (state.upcomingMatches.isNotEmpty) ...[
+                  if (upcomingMatches.isNotEmpty) ...[
                     SliverToBoxAdapter(
                       child: _SectionHeader(
                         title: 'Upcoming Matches',
@@ -173,14 +299,14 @@ class _HomePageState extends State<HomePage> {
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) =>
-                            _MatchListTile(match: state.upcomingMatches[index]),
-                        childCount: state.upcomingMatches.length,
+                            _MatchListTile(match: upcomingMatches[index]),
+                        childCount: upcomingMatches.length,
                       ),
                     ),
                   ],
 
                   // ─── Recent Matches ──────────────
-                  if (state.recentMatches.isNotEmpty) ...[
+                  if (recentMatches.isNotEmpty) ...[
                     SliverToBoxAdapter(
                       child: _SectionHeader(
                         title: 'Recent Results',
@@ -190,8 +316,8 @@ class _HomePageState extends State<HomePage> {
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) =>
-                            _MatchListTile(match: state.recentMatches[index]),
-                        childCount: state.recentMatches.length,
+                            _MatchListTile(match: recentMatches[index]),
+                        childCount: recentMatches.length,
                       ),
                     ),
                   ],

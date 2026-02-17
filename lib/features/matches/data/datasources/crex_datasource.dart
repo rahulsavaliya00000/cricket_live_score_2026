@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:cricketbuzz/features/matches/data/datasources/cricket_datasource.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
 import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart';
+import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
 
 class CrexDataSource implements CricketDataSource {
@@ -186,15 +187,37 @@ class CrexDataSource implements CricketDataSource {
                 }
               }
 
-              // Determine match status from text
+              // Determine match status from text more robustly
               MatchStatus matchStatus = status;
-              if (allText.contains('Live') || allText.contains('runs needed')) {
-                matchStatus = MatchStatus.live;
-              } else if (allText.contains('won by')) {
+              final lowerText = allText.toLowerCase();
+
+              bool hasMatch(String pattern) =>
+                  RegExp('\\b$pattern\\b').hasMatch(lowerText);
+
+              if (lowerText.contains('won by') ||
+                  hasMatch('won') ||
+                  hasMatch('result') ||
+                  hasMatch('drawn') ||
+                  hasMatch('abandoned') ||
+                  lowerText.contains('no result')) {
                 matchStatus = MatchStatus.completed;
-              } else if (allText.contains('Favourite') ||
-                  allText.contains('Today') ||
-                  allText.contains('Tomorrow')) {
+              } else if (hasMatch('live') ||
+                  lowerText.contains('runs needed') ||
+                  hasMatch('need') ||
+                  hasMatch('trail') ||
+                  hasMatch('lead') ||
+                  hasMatch('opted') ||
+                  hasMatch('choose') ||
+                  hasMatch('toss') ||
+                  hasMatch('stumps') ||
+                  (hasMatch('day') && !hasMatch('won'))) {
+                matchStatus = MatchStatus.live;
+              } else if (hasMatch('starts') ||
+                  hasMatch('am') ||
+                  hasMatch('pm') ||
+                  hasMatch('today') ||
+                  hasMatch('tomorrow') ||
+                  RegExp(r'\d{1,2}:\d{2}').hasMatch(lowerText)) {
                 matchStatus = MatchStatus.upcoming;
               }
 
@@ -353,13 +376,18 @@ class CrexDataSource implements CricketDataSource {
   }
 
   @override
-  Future<Player> getPlayerDetail(String playerId) async {
-    return const Player(
-      id: '',
-      name: 'Unknown Player',
-      country: 'Unknown',
-      role: 'Unknown',
-    );
+  Future<List<CricketTeam>> getTeams() async {
+    return CricketTeam.internationalTeams;
+  }
+
+  @override
+  Future<List<Player>> getTeamPlayers(String teamSlug, String teamId) async {
+    return [];
+  }
+
+  @override
+  Future<Player> getPlayerDetail(String id, String slug) async {
+    throw UnimplementedError();
   }
 
   @override
@@ -373,35 +401,8 @@ class CrexDataSource implements CricketDataSource {
   }
 
   @override
-  Future<List<PointsTableEntry>> getSeriesStandings(String seriesId) async {
-    return [];
-  }
-
-  @override
-  Future<List<Player>> getPlayers() async {
-    return _getFallbackPlayers();
-  }
-
-  @override
   Future<List<Series>> getSeries() async {
     return _getFallbackSeries();
-  }
-
-  List<Player> _getFallbackPlayers() {
-    return [
-      const Player(
-        id: '141',
-        name: 'Virat Kohli',
-        country: 'India',
-        role: 'Batsman',
-      ),
-      const Player(
-        id: '576',
-        name: 'Rohit Sharma',
-        country: 'India',
-        role: 'Batsman',
-      ),
-    ];
   }
 
   List<Series> _getFallbackSeries() {

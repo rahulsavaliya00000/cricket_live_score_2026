@@ -68,26 +68,139 @@ class _SeriesPageState extends State<SeriesPage> {
               onRetry: () => context.read<SeriesBloc>().add(LoadSeries()),
             );
           }
-          final seriesList = state.filteredSeries;
-          if (seriesList.isEmpty && state.status == SeriesStatus.loaded) {
-            return Center(
-              child: Text(
-                'No series found',
-                style: GoogleFonts.poppins(
-                  color: Theme.of(context).textTheme.bodySmall?.color,
+
+          return Column(
+            children: [
+              // Filter Chips
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    _FilterChip(
+                      label: 'All',
+                      isSelected: state.selectedType == null,
+                      onSelected: (selected) {
+                        if (selected) {
+                          context.read<SeriesBloc>().add(
+                            SelectSeriesType(null),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterChip(
+                      label: 'International',
+                      isSelected:
+                          state.selectedType == SeriesType.international,
+                      onSelected: (selected) {
+                        if (selected) {
+                          context.read<SeriesBloc>().add(
+                            SelectSeriesType(SeriesType.international),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterChip(
+                      label: 'T20 Leagues',
+                      isSelected: state.selectedType == SeriesType.t20League,
+                      onSelected: (selected) {
+                        if (selected) {
+                          context.read<SeriesBloc>().add(
+                            SelectSeriesType(SeriesType.t20League),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterChip(
+                      label: 'Domestic',
+                      isSelected: state.selectedType == SeriesType.domestic,
+                      onSelected: (selected) {
+                        if (selected) {
+                          context.read<SeriesBloc>().add(
+                            SelectSeriesType(SeriesType.domestic),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
-            );
-          }
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: seriesList.length,
-            itemBuilder: (context, index) {
-              return _SeriesCard(series: seriesList[index]);
-            },
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    final seriesList = state.filteredSeries;
+                    if (seriesList.isEmpty &&
+                        state.status == SeriesStatus.loaded) {
+                      return Center(
+                        child: Text(
+                          'No series found',
+                          style: GoogleFonts.poppins(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                      itemCount: seriesList.length,
+                      itemBuilder: (context, index) {
+                        return _SeriesCard(series: seriesList[index]);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final ValueChanged<bool> onSelected;
+
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: onSelected,
+      selectedColor: Theme.of(context).primaryColor,
+      labelStyle: GoogleFonts.poppins(
+        color: isSelected
+            ? Colors.white
+            : (isDark ? Colors.white70 : Colors.black87),
+        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        fontSize: 12,
+      ),
+      backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.grey[100],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: isSelected
+              ? Colors.transparent
+              : (isDark ? Colors.white10 : Colors.grey.withValues(alpha: 0.2)),
+        ),
+      ),
+      showCheckmark: false,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     );
   }
 }
@@ -100,12 +213,20 @@ class _SeriesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     Color typeColor;
+    String typeLabel = series.type.name.toUpperCase();
+
     switch (series.type) {
       case SeriesType.international:
         typeColor = AppColors.primaryGreen;
         break;
       case SeriesType.domestic:
         typeColor = AppColors.accentOrange;
+        break;
+      case SeriesType.t20League:
+      case SeriesType.ipl:
+        typeColor = AppColors.accentGold;
+        typeLabel = 'T20 LEAGUE';
+        if (series.type == SeriesType.ipl) typeLabel = 'IPL';
         break;
       default:
         typeColor = AppColors.accentGold;
@@ -140,7 +261,7 @@ class _SeriesCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    series.type.name.toUpperCase(),
+                    typeLabel,
                     style: GoogleFonts.poppins(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
@@ -166,7 +287,7 @@ class _SeriesCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '${series.startDate} - ${series.endDate} • ${series.matches.length} matches',
+              '${series.startDate} - ${series.endDate}',
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 color: Theme.of(context).textTheme.bodySmall?.color,
@@ -177,7 +298,4 @@ class _SeriesCard extends StatelessWidget {
       ),
     );
   }
-
-  // Start/end dates are already formatted strings
-  // No date conversion needed
 }

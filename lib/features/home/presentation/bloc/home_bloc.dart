@@ -20,6 +20,7 @@ class HomeState extends Equatable {
   final List<CricketMatch> liveMatches;
   final List<CricketMatch> upcomingMatches;
   final List<CricketMatch> recentMatches;
+  final bool isRefreshing;
   final String? error;
 
   const HomeState({
@@ -27,6 +28,7 @@ class HomeState extends Equatable {
     this.liveMatches = const [],
     this.upcomingMatches = const [],
     this.recentMatches = const [],
+    this.isRefreshing = false,
     this.error,
   });
 
@@ -35,6 +37,7 @@ class HomeState extends Equatable {
     List<CricketMatch>? liveMatches,
     List<CricketMatch>? upcomingMatches,
     List<CricketMatch>? recentMatches,
+    bool? isRefreshing,
     String? error,
   }) {
     return HomeState(
@@ -42,6 +45,7 @@ class HomeState extends Equatable {
       liveMatches: liveMatches ?? this.liveMatches,
       upcomingMatches: upcomingMatches ?? this.upcomingMatches,
       recentMatches: recentMatches ?? this.recentMatches,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
       error: error,
     );
   }
@@ -52,6 +56,7 @@ class HomeState extends Equatable {
     liveMatches,
     upcomingMatches,
     recentMatches,
+    isRefreshing,
     error,
   ];
 }
@@ -116,6 +121,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     print('✅ Starting refresh...');
     _isRefreshing = true;
+    emit(state.copyWith(isRefreshing: true));
 
     try {
       final startTime = DateTime.now();
@@ -127,34 +133,82 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         repository.getRecentMatches(),
       ]);
 
+      var liveMatches = results[0];
+      final upcomingMatches = results[1];
+      final recentMatches = results[2];
+
+      // Apply Monotonic Score Logic for Live Matches
+      liveMatches = liveMatches.map((newMatch) {
+        final existingMatch = state.liveMatches.firstWhereOrNull(
+          (m) => m.id == newMatch.id,
+        );
+
+        if (existingMatch == null) return newMatch;
+
+        // Compare scores and overs to ensure progress
+        final isProgress = _isScoreProgress(existingMatch, newMatch);
+        if (!isProgress) {
+          print('🛡️ Score jumped back for ${newMatch.id}, keeping old score');
+          return existingMatch.copyWith(
+            statusText: newMatch.statusText, // Allow status text updates
+          );
+        }
+        return newMatch;
+      }).toList();
+
       final endTime = DateTime.now();
       final duration = endTime.difference(startTime);
-      print('📥 Data arrived at: ${endTime.toString().split(' ')[1]}');
-      print(
-        '⏱️  Duration: ${duration.inMilliseconds}ms (${(duration.inMilliseconds / 1000).toStringAsFixed(2)}s)',
-      );
-      print(
-        '📊 Fetched: ${results[0].length} live, ${results[1].length} upcoming, ${results[2].length} recent',
-      );
+      print('⏱️ Duration: ${duration.inMilliseconds}ms');
 
-      // Always emit new state - Equatable will prevent unnecessary rebuilds
-      print('✅ Emitting new state');
       emit(
         state.copyWith(
           status: HomeStatus.loaded,
-          liveMatches: results[0],
-          upcomingMatches: results[1],
-          recentMatches: results[2],
+          liveMatches: liveMatches,
+          upcomingMatches: upcomingMatches,
+          recentMatches: recentMatches,
+          isRefreshing: false,
         ),
       );
 
       _lastRefreshTime = DateTime.now();
     } catch (e) {
-      // Don't emit error on refresh, just keep current data
       print('❌ Refresh error: $e');
+      emit(state.copyWith(isRefreshing: false));
     } finally {
       _isRefreshing = false;
       print('✅ Refresh completed');
     }
+  }
+
+  bool _isScoreProgress(CricketMatch oldM, CricketMatch newM) {
+    // Helper to evaluate if new score is actually an update
+    // For simplicity, we compare runs/wickets if possible,
+    // or just assume higher runs means progress.
+    final oldS1 = _parseRuns(oldM.team1.score);
+    final newS1 = _parseRuns(newM.team1.score);
+    final oldS2 = _parseRuns(oldM.team2.score);
+    final newS2 = _parseRuns(newM.team2.score);
+
+    // If either team has fewer runs than before, it's likely a cached/old response
+    if (newS1 < oldS1 || newS2 < oldS2) return false;
+
+    // If runs are same, check overs if parsed (or just trust it)
+    return true;
+  }
+
+  int _parseRuns(String? score) {
+    if (score == null || score.isEmpty) return 0;
+    // Extract first number (runs) before '/' or '-'
+    final match = RegExp(r'(\d+)').firstMatch(score);
+    return match != null ? int.tryParse(match.group(1)!) ?? 0 : 0;
+  }
+}
+
+extension CollectionExtensions<T> on Iterable<T> {
+  T? firstWhereOrNull(bool Function(T element) test) {
+    for (var element in this) {
+      if (test(element)) return element;
+    }
+    return null;
   }
 }

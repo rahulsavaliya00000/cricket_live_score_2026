@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cricketbuzz/features/matches/data/datasources/cricket_datasource.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
 import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart';
+import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
 
 /// Mock implementation of CricketDataSource with realistic Indian cricket data.
@@ -575,11 +576,6 @@ class MockCricketDataSource implements CricketDataSource {
   }
 
   // ─── Live Score Stream ───────────────────────────────────
-  @override
-  Future<List<PointsTableEntry>> getSeriesStandings(String seriesId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return [];
-  }
 
   @override
   Stream<CricketMatch> getLiveScoreStream(String matchId) async* {
@@ -594,20 +590,17 @@ class MockCricketDataSource implements CricketDataSource {
     }
   }
 
-  // ─── Players ─────────────────────────────────────────────
+  // ─── Teams & Players ────────────────────────────────────
   @override
-  Future<List<Player>> getPlayers() async {
+  Future<List<CricketTeam>> getTeams() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return _mockPlayers;
+    return CricketTeam.internationalTeams;
   }
 
   @override
-  Future<Player> getPlayerDetail(String playerId) async {
+  Future<List<Player>> getTeamPlayers(String teamSlug, String teamId) async {
     await Future.delayed(const Duration(milliseconds: 400));
-    return _mockPlayers.firstWhere(
-      (p) => p.id == playerId,
-      orElse: () => _mockPlayers.first,
-    );
+    return _mockPlayers;
   }
 
   // ─── Series ──────────────────────────────────────────────
@@ -626,38 +619,56 @@ class MockCricketDataSource implements CricketDataSource {
     );
   }
 
+  @override
+  Future<Player> getPlayerDetail(String id, String slug) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return _mockPlayers.firstWhere(
+      (p) => p.id == id,
+      orElse: () => _mockPlayers.first,
+    );
+  }
+
   // ─── Mock Data ──────────────────────────────────────────
   static final List<Player> _mockPlayers = [
     Player(
       id: 'p_virat',
       name: 'Virat Kohli',
+      slug: 'virat-kohli',
       country: 'India',
       imageUrl:
           'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/316600/316605.png',
       role: 'Batsman',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Medium',
+      bio:
+          'Virat Kohli is an Indian international cricketer and former captain of the Indian national team. He is widely regarded as one of the greatest batsmen of all time.',
+      born: 'Nov 05, 1988 (37 years)',
+      height: '5 ft 9 in',
       dateOfBirth: DateTime(1988, 11, 5),
       teams: const ['India', 'Royal Challengers Bengaluru', 'Delhi'],
-      battingStats: const PlayerStats(
-        matches: 292,
-        innings: 283,
-        runs: 13848,
-        notOuts: 42,
-        highestScore: 183,
-        average: 57.45,
-        strikeRate: 93.25,
-        hundreds: 50,
-        fifties: 72,
-        fours: 1245,
-        sixes: 258,
-      ),
-      bowlingStats: const PlayerStats(
-        wickets: 4,
-        bowlingAverage: 166.25,
-        economy: 5.35,
-        bestBowling: '1/15',
-      ),
+      battingStats: {
+        'ODI': const PlayerStats(
+          matches: 292,
+          innings: 283,
+          runs: 13848,
+          notOuts: 42,
+          highestScore: 183,
+          average: 57.45,
+          strikeRate: 93.25,
+          hundreds: 50,
+          fifties: 72,
+          fours: 1245,
+          sixes: 258,
+        ),
+      },
+      bowlingStats: {
+        'ODI': const PlayerStats(
+          wickets: 4,
+          bowlingAverage: 166.25,
+          economy: 5.35,
+          bestBowling: '1/15',
+        ),
+      },
       recentPerformances: const [
         RecentPerformance(
           matchTitle: '1st Test vs AUS',
@@ -685,27 +696,34 @@ class MockCricketDataSource implements CricketDataSource {
     Player(
       id: 'p_rohit',
       name: 'Rohit Sharma',
+      slug: 'rohit-sharma',
       country: 'India',
       imageUrl:
           'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/316500/316584.png',
       role: 'Batsman',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Off Break',
+      bio:
+          'Rohit Gurunath Sharma is an Indian international cricketer and the current captain of the Indian national cricket team in all formats.',
+      born: 'Apr 30, 1987 (38 years)',
+      height: '5 ft 8 in',
       dateOfBirth: DateTime(1987, 4, 30),
       teams: const ['India', 'Mumbai Indians'],
-      battingStats: const PlayerStats(
-        matches: 264,
-        innings: 256,
-        runs: 10709,
-        notOuts: 18,
-        highestScore: 264,
-        average: 43.26,
-        strikeRate: 90.55,
-        hundreds: 31,
-        fifties: 55,
-        fours: 1048,
-        sixes: 312,
-      ),
+      battingStats: {
+        'ODI': const PlayerStats(
+          matches: 264,
+          innings: 256,
+          runs: 10709,
+          notOuts: 18,
+          highestScore: 264,
+          average: 43.26,
+          strikeRate: 90.55,
+          hundreds: 31,
+          fifties: 55,
+          fours: 1048,
+          sixes: 312,
+        ),
+      },
       recentPerformances: const [
         RecentPerformance(
           matchTitle: '1st Test vs AUS',
@@ -726,29 +744,38 @@ class MockCricketDataSource implements CricketDataSource {
     Player(
       id: 'p_bumrah',
       name: 'Jasprit Bumrah',
+      slug: 'jasprit-bumrah',
       country: 'India',
       imageUrl:
           'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/316400/316484.png',
       role: 'Bowler',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Fast',
+      bio:
+          'Jasprit Jasbirsingh Bumrah is an Indian international cricketer who plays for the Indian cricket team in all formats of the game.',
+      born: 'Dec 06, 1993 (32 years)',
+      height: '5 ft 10 in',
       dateOfBirth: DateTime(1993, 12, 6),
       teams: const ['India', 'Mumbai Indians'],
-      bowlingStats: const PlayerStats(
-        matches: 162,
-        innings: 155,
-        wickets: 352,
-        bowlingAverage: 21.83,
-        economy: 4.48,
-        bestBowling: '6/19',
-        fiveWickets: 8,
-      ),
-      battingStats: const PlayerStats(
-        matches: 162,
-        runs: 186,
-        highestScore: 35,
-        average: 8.45,
-      ),
+      bowlingStats: {
+        'Test': const PlayerStats(
+          matches: 36,
+          innings: 69,
+          wickets: 159,
+          bowlingAverage: 20.69,
+          economy: 2.74,
+          bestBowling: '6/27',
+          fiveWickets: 10,
+        ),
+      },
+      battingStats: {
+        'Test': const PlayerStats(
+          matches: 36,
+          runs: 212,
+          highestScore: 34,
+          average: 6.42,
+        ),
+      },
       recentPerformances: const [
         RecentPerformance(
           matchTitle: '1st Test vs AUS',
@@ -762,118 +789,153 @@ class MockCricketDataSource implements CricketDataSource {
     Player(
       id: 'p_gill',
       name: 'Shubman Gill',
+      slug: 'shubman-gill',
       country: 'India',
       imageUrl:
           'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/322600/322611.png',
       role: 'Batsman',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Off Break',
+      bio:
+          'Shubman Gill is an Indian international cricketer who plays for the Indian cricket team in all formats of the game.',
+      born: 'Sep 08, 1999 (26 years)',
+      height: '5 ft 10 in',
       dateOfBirth: DateTime(1999, 9, 8),
       teams: const ['India', 'Gujarat Titans'],
-      battingStats: const PlayerStats(
-        matches: 68,
-        innings: 65,
-        runs: 3124,
-        notOuts: 5,
-        highestScore: 128,
-        average: 52.06,
-        strikeRate: 88.74,
-        hundreds: 8,
-        fifties: 17,
-        fours: 342,
-        sixes: 58,
-      ),
+      battingStats: {
+        'ODI': const PlayerStats(
+          matches: 68,
+          innings: 65,
+          runs: 3124,
+          notOuts: 5,
+          highestScore: 128,
+          average: 52.06,
+          strikeRate: 88.74,
+          hundreds: 8,
+          fifties: 17,
+          fours: 342,
+          sixes: 58,
+        ),
+      },
     ),
     Player(
       id: 'p_pant',
       name: 'Rishabh Pant',
+      slug: 'rishabh-pant',
       country: 'India',
       imageUrl:
           'https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320/lsci/db/PICTURES/CMS/322600/322613.png',
       role: 'Wicket-keeper',
       battingStyle: 'Left Handed Bat',
       bowlingStyle: '',
+      bio:
+          'Rishabh Rajendra Pant is an Indian international cricketer who plays for the Indian cricket team as a wicket-keeper batsman.',
+      born: 'Oct 04, 1997 (28 years)',
+      height: '5 ft 7 in',
       dateOfBirth: DateTime(1997, 10, 4),
       teams: const ['India', 'Delhi Capitals'],
-      battingStats: const PlayerStats(
-        matches: 78,
-        innings: 72,
-        runs: 3240,
-        notOuts: 8,
-        highestScore: 159,
-        average: 50.62,
-        strikeRate: 73.21,
-        hundreds: 7,
-        fifties: 18,
-        fours: 358,
-        sixes: 96,
-      ),
+      battingStats: {
+        'Test': const PlayerStats(
+          matches: 33,
+          innings: 56,
+          runs: 2271,
+          notOuts: 4,
+          highestScore: 159,
+          average: 43.67,
+          strikeRate: 73.63,
+          hundreds: 5,
+          fifties: 11,
+          fours: 254,
+          sixes: 55,
+        ),
+      },
     ),
     Player(
       id: 'p_smith',
       name: 'Steve Smith',
+      slug: 'steve-smith',
       country: 'Australia',
       imageUrl: '',
       role: 'Batsman',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Leg Break',
+      bio:
+          'Steven Peter Devereux Smith is an Australian international cricketer and former captain of the Australian national team.',
+      born: 'Jun 02, 1989 (36 years)',
+      height: '5 ft 9 in',
       dateOfBirth: DateTime(1989, 6, 2),
       teams: const ['Australia', 'New South Wales'],
-      battingStats: const PlayerStats(
-        matches: 198,
-        innings: 345,
-        runs: 9685,
-        notOuts: 28,
-        highestScore: 239,
-        average: 57.65,
-        strikeRate: 55.43,
-        hundreds: 32,
-        fifties: 40,
-      ),
+      battingStats: {
+        'Test': const PlayerStats(
+          matches: 102,
+          innings: 181,
+          runs: 9320,
+          notOuts: 22,
+          highestScore: 239,
+          average: 58.61,
+          strikeRate: 53.94,
+          hundreds: 32,
+          fifties: 39,
+        ),
+      },
     ),
     Player(
       id: 'p_cummins',
       name: 'Pat Cummins',
+      slug: 'pat-cummins',
       country: 'Australia',
       imageUrl: '',
       role: 'Bowler',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: 'Right Arm Fast',
+      bio:
+          'Patrick James Cummins is an Australian international cricketer who is the current captain of the Australian Test and ODI teams.',
+      born: 'May 08, 1993 (32 years)',
+      height: '6 ft 3 in',
       dateOfBirth: DateTime(1993, 5, 8),
       teams: const ['Australia', 'Kolkata Knight Riders'],
-      bowlingStats: const PlayerStats(
-        matches: 145,
-        innings: 140,
-        wickets: 295,
-        bowlingAverage: 23.45,
-        economy: 2.98,
-        bestBowling: '5/38',
-        fiveWickets: 5,
-      ),
+      bowlingStats: {
+        'Test': const PlayerStats(
+          matches: 55,
+          innings: 102,
+          wickets: 242,
+          bowlingAverage: 22.25,
+          economy: 2.76,
+          bestBowling: '6/23',
+          fiveWickets: 9,
+        ),
+      },
     ),
     Player(
       id: 'p_dhoni',
       name: 'MS Dhoni',
+      slug: 'ms-dhoni',
       country: 'India',
       imageUrl: '',
       role: 'Wicket-keeper',
       battingStyle: 'Right Handed Bat',
       bowlingStyle: '',
+      bio:
+          'Mahendra Singh Dhoni is an Indian professional cricketer who was the captain of the Indian national cricket team.',
+      born: 'Jul 07, 1981 (44 years)',
+      height: '5 ft 9 in',
       dateOfBirth: DateTime(1981, 7, 7),
       teams: const ['India', 'Chennai Super Kings', 'Jharkhand'],
-      battingStats: const PlayerStats(
-        matches: 538,
-        innings: 472,
-        runs: 17266,
-        notOuts: 84,
-        highestScore: 183,
-        average: 44.51,
-        strikeRate: 87.56,
-        hundreds: 16,
-        fifties: 108,
-        fours: 1378,
-        sixes: 358,
-      ),
+      battingStats: {
+        'ODI': const PlayerStats(
+          matches: 350,
+          innings: 297,
+          runs: 10773,
+          notOuts: 84,
+          highestScore: 183,
+          average: 50.57,
+          strikeRate: 87.56,
+          hundreds: 10,
+          fifties: 73,
+          fours: 826,
+          sixes: 229,
+        ),
+      },
     ),
   ];
 
@@ -897,98 +959,6 @@ class MockCricketDataSource implements CricketDataSource {
         'LSG',
         'RR',
         'PBKS',
-      ],
-      pointsTable: const [
-        PointsTableEntry(
-          teamName: 'Mumbai Indians',
-          teamShortName: 'MI',
-          matches: 10,
-          won: 7,
-          lost: 3,
-          points: 14,
-          netRunRate: 0.842,
-        ),
-        PointsTableEntry(
-          teamName: 'Chennai Super Kings',
-          teamShortName: 'CSK',
-          matches: 10,
-          won: 7,
-          lost: 3,
-          points: 14,
-          netRunRate: 0.654,
-        ),
-        PointsTableEntry(
-          teamName: 'Kolkata Knight Riders',
-          teamShortName: 'KKR',
-          matches: 10,
-          won: 6,
-          lost: 4,
-          points: 12,
-          netRunRate: 0.512,
-        ),
-        PointsTableEntry(
-          teamName: 'Royal Challengers Bengaluru',
-          teamShortName: 'RCB',
-          matches: 10,
-          won: 6,
-          lost: 4,
-          points: 12,
-          netRunRate: 0.321,
-        ),
-        PointsTableEntry(
-          teamName: 'Gujarat Titans',
-          teamShortName: 'GT',
-          matches: 10,
-          won: 5,
-          lost: 5,
-          points: 10,
-          netRunRate: 0.145,
-        ),
-        PointsTableEntry(
-          teamName: 'Rajasthan Royals',
-          teamShortName: 'RR',
-          matches: 10,
-          won: 5,
-          lost: 5,
-          points: 10,
-          netRunRate: -0.089,
-        ),
-        PointsTableEntry(
-          teamName: 'Delhi Capitals',
-          teamShortName: 'DC',
-          matches: 10,
-          won: 4,
-          lost: 6,
-          points: 8,
-          netRunRate: -0.234,
-        ),
-        PointsTableEntry(
-          teamName: 'Lucknow Super Giants',
-          teamShortName: 'LSG',
-          matches: 10,
-          won: 4,
-          lost: 6,
-          points: 8,
-          netRunRate: -0.456,
-        ),
-        PointsTableEntry(
-          teamName: 'Sunrisers Hyderabad',
-          teamShortName: 'SRH',
-          matches: 10,
-          won: 3,
-          lost: 7,
-          points: 6,
-          netRunRate: -0.678,
-        ),
-        PointsTableEntry(
-          teamName: 'Punjab Kings',
-          teamShortName: 'PBKS',
-          matches: 10,
-          won: 2,
-          lost: 8,
-          points: 4,
-          netRunRate: -1.123,
-        ),
       ],
     ),
     Series(

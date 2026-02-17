@@ -17,6 +17,13 @@ class LoadMatchDetail extends MatchDetailEvent {
   List<Object?> get props => [matchId];
 }
 
+class RefreshMatchDetail extends MatchDetailEvent {
+  final String matchId;
+  RefreshMatchDetail(this.matchId);
+  @override
+  List<Object?> get props => [matchId];
+}
+
 class SubscribeToLiveScore extends MatchDetailEvent {
   final String matchId;
   SubscribeToLiveScore(this.matchId);
@@ -69,6 +76,7 @@ class MatchDetailBloc extends Bloc<MatchDetailEvent, MatchDetailState> {
   MatchDetailBloc({required this.repository})
     : super(const MatchDetailState()) {
     on<LoadMatchDetail>(_onLoadDetail);
+    on<RefreshMatchDetail>(_onRefreshDetail);
     on<SubscribeToLiveScore>(_onSubscribeLive);
     on<LiveScoreUpdated>(_onLiveUpdate);
   }
@@ -90,6 +98,32 @@ class MatchDetailBloc extends Bloc<MatchDetailEvent, MatchDetailState> {
     }
   }
 
+  Future<void> _onRefreshDetail(
+    RefreshMatchDetail event,
+    Emitter<MatchDetailState> emit,
+  ) async {
+    try {
+      final newDetail = await repository.getMatchDetail(event.matchId);
+      final currentDetail = state.matchDetail;
+
+      if (currentDetail != null) {
+        if (!_isDetailProgress(currentDetail, newDetail)) {
+          print('🛡️ MatchDetail regression detected, skipping update');
+          return;
+        }
+      }
+
+      emit(
+        state.copyWith(
+          status: MatchDetailStatus.loaded,
+          matchDetail: newDetail,
+        ),
+      );
+    } catch (e) {
+      print('❌ Silent refresh failed: $e');
+    }
+  }
+
   void _onSubscribeLive(
     SubscribeToLiveScore event,
     Emitter<MatchDetailState> emit,
@@ -102,17 +136,60 @@ class MatchDetailBloc extends Bloc<MatchDetailEvent, MatchDetailState> {
 
   void _onLiveUpdate(LiveScoreUpdated event, Emitter<MatchDetailState> emit) {
     if (state.matchDetail != null) {
+      final currentDetail = state.matchDetail!;
+
+      // Check if this live match update is a regression
+      if (!_isMatchProgress(currentDetail.match, event.match)) {
+        print('🛡️ Live score regression detected, skipping update');
+        return;
+      }
+
       emit(
         state.copyWith(
           matchDetail: MatchDetail(
             match: event.match,
-            innings: state.matchDetail!.innings,
-            commentary: state.matchDetail!.commentary,
-            stats: state.matchDetail!.stats,
+            innings: currentDetail.innings,
+            commentary: currentDetail.commentary,
+            playingXI: currentDetail.playingXI,
+            playingXI1: currentDetail.playingXI1,
+            playingXI2: currentDetail.playingXI2,
+            stats: currentDetail.stats,
           ),
         ),
       );
     }
+  }
+
+  bool _isDetailProgress(MatchDetail oldD, MatchDetail newD) {
+    return _isMatchProgress(oldD.match, newD.match);
+  }
+
+  bool _isMatchProgress(CricketMatch oldM, CricketMatch newM) {
+    final oldS1 = _parseRuns(oldM.team1.score);
+    final newS1 = _parseRuns(newM.team1.score);
+    final oldS2 = _parseRuns(oldM.team2.score);
+    final newS2 = _parseRuns(newM.team2.score);
+
+    // If either team has fewer runs than before, it's a regression
+    if (newS1 < oldS1 || newS2 < oldS2) return false;
+
+    // If runs are same, check overs if possible
+    final oldO1 = double.tryParse(oldM.team1.overs ?? '0') ?? 0.0;
+    final newO1 = double.tryParse(newM.team1.overs ?? '0') ?? 0.0;
+    final oldO2 = double.tryParse(oldM.team2.overs ?? '0') ?? 0.0;
+    final newO2 = double.tryParse(newM.team2.overs ?? '0') ?? 0.0;
+
+    if (newS1 == oldS1 && newS2 == oldS2) {
+      if (newO1 < oldO1 || newO2 < oldO2) return false;
+    }
+
+    return true;
+  }
+
+  int _parseRuns(String? score) {
+    if (score == null || score.isEmpty) return 0;
+    final match = RegExp(r'(\d+)').firstMatch(score);
+    return match != null ? int.tryParse(match.group(1)!) ?? 0 : 0;
   }
 
   @override

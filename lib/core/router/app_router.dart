@@ -9,6 +9,7 @@ import 'package:cricketbuzz/features/matches/presentation/pages/matches_page.dar
 import 'package:cricketbuzz/features/matches/presentation/pages/match_detail_page.dart';
 import 'package:cricketbuzz/features/players/presentation/pages/players_page.dart';
 import 'package:cricketbuzz/features/players/presentation/pages/player_detail_page.dart';
+import 'package:cricketbuzz/features/players/presentation/pages/team_players_page.dart';
 import 'package:cricketbuzz/features/series/presentation/pages/series_page.dart';
 import 'package:cricketbuzz/features/series/presentation/pages/series_detail_page.dart';
 import 'package:cricketbuzz/features/profile/presentation/pages/profile_page.dart';
@@ -16,7 +17,7 @@ import 'package:cricketbuzz/features/settings/presentation/pages/settings_page.d
 import 'package:cricketbuzz/features/profile/presentation/pages/privacy_policy_page.dart';
 import 'package:cricketbuzz/features/profile/presentation/pages/terms_page.dart';
 import 'package:cricketbuzz/features/profile/presentation/pages/premium_page.dart';
-import 'package:cricketbuzz/features/browser/presentation/pages/browser_page.dart';
+import 'package:cricketbuzz/features/profile/presentation/pages/suggestion_page.dart';
 import 'package:cricketbuzz/core/widgets/scaffold_with_nav.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -73,11 +74,6 @@ GoRouter createRouter(AuthBloc authBloc) {
                 const NoTransitionPage(child: PlayersPage()),
           ),
           GoRoute(
-            path: '/browser',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BrowserPage()),
-          ),
-          GoRoute(
             path: '/profile',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: ProfilePage()),
@@ -90,14 +86,24 @@ GoRouter createRouter(AuthBloc authBloc) {
             MatchDetailPage(matchId: state.pathParameters['id']!),
       ),
       GoRoute(
-        path: '/player/:id',
-        builder: (context, state) =>
-            PlayerDetailPage(playerId: state.pathParameters['id']!),
+        path: '/player/:id/:slug',
+        builder: (context, state) => PlayerDetailPage(
+          playerId: state.pathParameters['id']!,
+          playerSlug: state.pathParameters['slug']!,
+        ),
       ),
       GoRoute(
         path: '/series-detail/:id',
         builder: (context, state) =>
             SeriesDetailPage(seriesId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/team-players/:slug/:id',
+        builder: (context, state) => TeamPlayersPage(
+          teamSlug: state.pathParameters['slug']!,
+          teamId: state.pathParameters['id']!,
+          teamName: (state.extra as String?) ?? 'Team',
+        ),
       ),
       GoRoute(
         path: '/settings',
@@ -111,6 +117,10 @@ GoRouter createRouter(AuthBloc authBloc) {
       GoRoute(
         path: '/premium',
         builder: (context, state) => const PremiumPage(),
+      ),
+      GoRoute(
+        path: '/suggestion',
+        builder: (context, state) => const SuggestionPage(),
       ),
     ],
   );

@@ -4,8 +4,54 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cricketbuzz/core/constants/app_colors.dart';
 import 'package:cricketbuzz/core/theme/theme_bloc.dart';
 
-class SettingsPage extends StatelessWidget {
+import 'package:cricketbuzz/core/services/notification_service.dart';
+
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool _dailyEnabled = true;
+  bool _matchStart = true;
+  bool _wicket = true;
+  bool _result = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    final service = NotificationService();
+    final enabled = await service.isEnabled();
+    final prefs = await service.getPreferences();
+    if (mounted) {
+      setState(() {
+        _dailyEnabled = enabled;
+        _matchStart = prefs['matchStart'] ?? true;
+        _wicket = prefs['wicket'] ?? true;
+        _result = prefs['result'] ?? true;
+      });
+    }
+  }
+
+  Future<void> _toggleDaily(bool value) async {
+    setState(() => _dailyEnabled = value);
+    await NotificationService().setEnabled(value);
+  }
+
+  Future<void> _updatePreference(String key, bool value) async {
+    setState(() {
+      if (key == 'matchStart') _matchStart = value;
+      if (key == 'wicket') _wicket = value;
+      if (key == 'result') _result = value;
+    });
+    await NotificationService().setPreference(key, value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,11 +131,29 @@ class SettingsPage extends StatelessWidget {
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     title: Text(
+                      'Daily Match Alerts',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Get a daily summary of matches',
+                      style: GoogleFonts.poppins(fontSize: 11),
+                    ),
+                    value: _dailyEnabled,
+                    onChanged: (v) => _toggleDaily(v),
+                    activeThumbColor: AppColors.primaryGreen,
+                  ),
+                  const Divider(),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
                       'Match Start Alerts',
                       style: GoogleFonts.poppins(fontSize: 14),
                     ),
-                    value: true,
-                    onChanged: (v) {},
+                    value: _matchStart,
+                    onChanged: (v) => _updatePreference('matchStart', v),
                     activeThumbColor: AppColors.primaryGreen,
                   ),
                   SwitchListTile(
@@ -98,8 +162,8 @@ class SettingsPage extends StatelessWidget {
                       'Wicket Alerts',
                       style: GoogleFonts.poppins(fontSize: 14),
                     ),
-                    value: true,
-                    onChanged: (v) {},
+                    value: _wicket,
+                    onChanged: (v) => _updatePreference('wicket', v),
                     activeThumbColor: AppColors.primaryGreen,
                   ),
                   SwitchListTile(
@@ -108,8 +172,8 @@ class SettingsPage extends StatelessWidget {
                       'Result Alerts',
                       style: GoogleFonts.poppins(fontSize: 14),
                     ),
-                    value: true,
-                    onChanged: (v) {},
+                    value: _result,
+                    onChanged: (v) => _updatePreference('result', v),
                     activeThumbColor: AppColors.primaryGreen,
                   ),
                 ],

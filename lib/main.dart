@@ -13,6 +13,7 @@ import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
 import 'package:cricketbuzz/features/players/presentation/bloc/players_bloc.dart';
 import 'package:cricketbuzz/features/series/presentation/bloc/series_bloc.dart';
 import 'package:cricketbuzz/core/services/notification_service.dart';
+import 'package:cricketbuzz/core/widgets/connectivity_wrapper.dart';
 import 'package:cricketbuzz/firebase_options.dart';
 
 void main() async {
@@ -94,8 +95,11 @@ class _AppViewState extends State<AppView> {
           routerConfig: _router,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          builder: (context, child) {
+            return ConnectivityWrapper(child: child!);
+          },
         );
       },
-    );
+    );  
   }
 }

@@ -21,6 +21,7 @@ class _MatchesPageState extends State<MatchesPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   Timer? _autoRefreshTimer;
+  MatchCategory _selectedCategory = MatchCategory.all;
 
   @override
   void initState() {
@@ -37,12 +38,16 @@ class _MatchesPageState extends State<MatchesPage>
   }
 
   void _startAutoRefresh() {
-    // Auto-refresh every 30 seconds
     _autoRefreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       if (mounted) {
         context.read<HomeBloc>().add(RefreshHomeData());
       }
     });
+  }
+
+  List<CricketMatch> _filter(List<CricketMatch> matches) {
+    if (_selectedCategory == MatchCategory.all) return matches;
+    return matches.where((m) => _selectedCategory.matches(m)).toList();
   }
 
   @override
@@ -53,14 +58,61 @@ class _MatchesPageState extends State<MatchesPage>
           'Matches',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
-        bottom: TabBar(
-          dividerColor: Colors.transparent,
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Live'),
-            Tab(text: 'Upcoming'),
-            Tab(text: 'Results'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(90),
+          child: Column(
+            children: [
+              // ─── Filter Chips ──────────────
+              SizedBox(
+                height: 40,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: MatchCategory.values.map((cat) {
+                    final selected = _selectedCategory == cat;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(
+                          cat.label,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                            color: selected ? Colors.white : null,
+                          ),
+                        ),
+                        selected: selected,
+                        onSelected: (_) =>
+                            setState(() => _selectedCategory = cat),
+                        selectedColor: AppColors.primaryGreen,
+                        checkmarkColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        side: BorderSide(
+                          color: selected
+                              ? AppColors.primaryGreen
+                              : Colors.grey.shade400,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              // ─── Tabs ─────────────────────
+              TabBar(
+                dividerColor: Colors.transparent,
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: 'Live'),
+                  Tab(text: 'Upcoming'),
+                  Tab(text: 'Results'),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       body: BlocBuilder<HomeBloc, HomeState>(
@@ -78,15 +130,15 @@ class _MatchesPageState extends State<MatchesPage>
             controller: _tabController,
             children: [
               _MatchList(
-                matches: state.liveMatches,
+                matches: _filter(state.liveMatches),
                 emptyText: 'No live matches right now',
               ),
               _MatchList(
-                matches: state.upcomingMatches,
+                matches: _filter(state.upcomingMatches),
                 emptyText: 'No upcoming matches',
               ),
               _MatchList(
-                matches: state.recentMatches,
+                matches: _filter(state.recentMatches),
                 emptyText: 'No recent results',
               ),
             ],
@@ -176,25 +228,7 @@ class _MatchCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (match.status == MatchStatus.live)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.liveGradient,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'LIVE',
-                      style: GoogleFonts.poppins(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                _StatusChip(status: match.status),
               ],
             ),
             const SizedBox(height: 10),
@@ -338,6 +372,52 @@ class _BannerAdPlaceholder extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final MatchStatus status;
+  const _StatusChip({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    String label;
+    LinearGradient gradient;
+
+    switch (status) {
+      case MatchStatus.live:
+        label = 'LIVE';
+        gradient = AppColors.liveGradient;
+        break;
+      case MatchStatus.upcoming:
+        label = 'UPCOMING';
+        gradient = const LinearGradient(
+          colors: [AppColors.accentOrange, AppColors.accentGold],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+        break;
+      case MatchStatus.completed:
+        label = 'RESULT';
+        gradient = AppColors.primaryGradient;
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 9,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
         ),
       ),
     );
