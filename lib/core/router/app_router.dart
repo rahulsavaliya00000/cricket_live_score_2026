@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
+
 import 'package:cricketbuzz/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:cricketbuzz/features/auth/presentation/pages/login_page.dart';
 import 'package:cricketbuzz/features/auth/presentation/pages/guest_name_page.dart';
@@ -82,8 +84,10 @@ GoRouter createRouter(AuthBloc authBloc) {
       ),
       GoRoute(
         path: '/match/:id',
-        builder: (context, state) =>
-            MatchDetailPage(matchId: state.pathParameters['id']!),
+        builder: (context, state) => MatchDetailPage(
+          matchId: state.pathParameters['id']!,
+          previewMatch: state.extra as CricketMatch?,
+        ),
       ),
       GoRoute(
         path: '/player/:id/:slug',

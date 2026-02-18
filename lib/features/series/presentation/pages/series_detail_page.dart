@@ -147,7 +147,7 @@ class _SeriesMatchCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: () => context.push('/match/${match.id}'),
+      onTap: () => context.push('/match/${match.id}', extra: match),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),

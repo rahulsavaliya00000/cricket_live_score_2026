@@ -12,9 +12,10 @@ abstract class MatchDetailEvent extends Equatable {
 
 class LoadMatchDetail extends MatchDetailEvent {
   final String matchId;
-  LoadMatchDetail(this.matchId);
+  final CricketMatch? previewMatch;
+  LoadMatchDetail(this.matchId, {this.previewMatch});
   @override
-  List<Object?> get props => [matchId];
+  List<Object?> get props => [matchId, previewMatch];
 }
 
 class RefreshMatchDetail extends MatchDetailEvent {
@@ -85,16 +86,37 @@ class MatchDetailBloc extends Bloc<MatchDetailEvent, MatchDetailState> {
     LoadMatchDetail event,
     Emitter<MatchDetailState> emit,
   ) async {
-    emit(state.copyWith(status: MatchDetailStatus.loading));
-    try {
-      final detail = await repository.getMatchDetail(event.matchId);
+    if (event.previewMatch != null) {
       emit(
-        state.copyWith(status: MatchDetailStatus.loaded, matchDetail: detail),
+        state.copyWith(
+          status: MatchDetailStatus.loading,
+          matchDetail: MatchDetail(match: event.previewMatch!),
+        ),
+      );
+    } else {
+      emit(state.copyWith(status: MatchDetailStatus.loading));
+    }
+
+    try {
+      final fetchedDetail = await repository.getMatchDetail(event.matchId);
+
+      // Merge with existing param (which might be the preview) to preserve flags
+      final mergedDetail = _mergeWithPreview(state.matchDetail, fetchedDetail);
+
+      emit(
+        state.copyWith(
+          status: MatchDetailStatus.loaded,
+          matchDetail: mergedDetail,
+        ),
       );
     } catch (e) {
-      emit(
-        state.copyWith(status: MatchDetailStatus.error, error: e.toString()),
-      );
+      if (state.matchDetail == null) {
+        emit(
+          state.copyWith(status: MatchDetailStatus.error, error: e.toString()),
+        );
+      }
+      // If we have preview data, we can silently fail or show a snackbar (not handled here),
+      // but we shouldn't replace valid preview data with an error screen ideally.
     }
   }
 
@@ -108,20 +130,48 @@ class MatchDetailBloc extends Bloc<MatchDetailEvent, MatchDetailState> {
 
       if (currentDetail != null) {
         if (!_isDetailProgress(currentDetail, newDetail)) {
-          print('🛡️ MatchDetail regression detected, skipping update');
+          // print('🛡️ MatchDetail regression detected, skipping update');
           return;
         }
       }
 
+      // Merge to ensure we don't lose flags on refresh either
+      final mergedDetail = _mergeWithPreview(currentDetail, newDetail);
+
       emit(
         state.copyWith(
           status: MatchDetailStatus.loaded,
-          matchDetail: newDetail,
+          matchDetail: mergedDetail,
         ),
       );
     } catch (e) {
-      print('❌ Silent refresh failed: $e');
+      // print('❌ Silent refresh failed: $e');
     }
+  }
+
+  /// Merges [incoming] detail with [existing] to preserve data like flags
+  /// that might be missing in the [incoming] (e.g. from a partial API response).
+  MatchDetail _mergeWithPreview(MatchDetail? existing, MatchDetail incoming) {
+    if (existing == null) return incoming;
+
+    var t1 = incoming.match.team1;
+    var t2 = incoming.match.team2;
+
+    // Preserve Team 1 Flag
+    // If existing has a flag, PREFER it over the incoming one (which might be a scraped banner or empty)
+    if (existing.match.team1.flagUrl.isNotEmpty) {
+      t1 = t1.copyWith(flagUrl: existing.match.team1.flagUrl);
+    }
+
+    // Preserve Team 2 Flag
+    if (existing.match.team2.flagUrl.isNotEmpty) {
+      t2 = t2.copyWith(flagUrl: existing.match.team2.flagUrl);
+    }
+
+    // Return new detail with updated teams
+    return incoming.copyWith(
+      match: incoming.match.copyWith(team1: t1, team2: t2),
+    );
   }
 
   void _onSubscribeLive(

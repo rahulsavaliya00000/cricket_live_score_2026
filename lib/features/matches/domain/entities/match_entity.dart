@@ -271,6 +271,26 @@ class MatchDetail extends Equatable {
     this.stats,
   });
 
+  MatchDetail copyWith({
+    CricketMatch? match,
+    List<Innings>? innings,
+    List<BallCommentary>? commentary,
+    List<String>? playingXI,
+    List<String>? playingXI1,
+    List<String>? playingXI2,
+    MatchStats? stats,
+  }) {
+    return MatchDetail(
+      match: match ?? this.match,
+      innings: innings ?? this.innings,
+      commentary: commentary ?? this.commentary,
+      playingXI: playingXI ?? this.playingXI,
+      playingXI1: playingXI1 ?? this.playingXI1,
+      playingXI2: playingXI2 ?? this.playingXI2,
+      stats: stats ?? this.stats,
+    );
+  }
+
   @override
   List<Object?> get props => [
     match.id,

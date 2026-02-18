@@ -4,7 +4,7 @@ import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
 
 /// Abstract data source for cricket data.
-/// Swap this implementation for real API or web scraping.
+/// Swap this implementation for real API.
 abstract class CricketDataSource {
   Future<List<CricketMatch>> getLiveMatches();
   Future<List<CricketMatch>> getUpcomingMatches();

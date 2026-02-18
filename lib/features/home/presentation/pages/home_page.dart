@@ -385,7 +385,7 @@ class _LiveMatchCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: () => context.push('/match/${match.id}'),
+      onTap: () => context.push('/match/${match.id}', extra: match),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
         decoration: BoxDecoration(
@@ -627,7 +627,7 @@ class _MatchListTile extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: () => context.push('/match/${match.id}'),
+      onTap: () => context.push('/match/${match.id}', extra: match),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         padding: const EdgeInsets.all(14),

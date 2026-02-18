@@ -81,6 +81,14 @@ class AuthDataSourceImpl implements AuthDataSource {
 
       await saveUserToFirestore(newUser);
       return newUser;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'admin-restricted-operation' ||
+          e.code == 'operation-not-allowed') {
+        throw AuthException(
+          'Guest login is disabled. Please enable "Anonymous" in Firebase Console.',
+        );
+      }
+      throw AuthException(e.message ?? 'Guest sign in failed');
     } catch (e) {
       throw AuthException('Guest sign in failed: $e');
     }

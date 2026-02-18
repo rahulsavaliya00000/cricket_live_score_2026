@@ -24,20 +24,20 @@ class CrexDataSource implements CricketDataSource {
 
   @override
   Future<List<CricketMatch>> getLiveMatches() async {
-    return _scrapeMatches('/', MatchStatus.live);
+    return _fetchMatches('/', MatchStatus.live);
   }
 
   @override
   Future<List<CricketMatch>> getUpcomingMatches() async {
-    return _scrapeMatches('/schedule', MatchStatus.upcoming);
+    return _fetchMatches('/schedule', MatchStatus.upcoming);
   }
 
   @override
   Future<List<CricketMatch>> getRecentMatches() async {
-    return _scrapeMatches('/', MatchStatus.completed);
+    return _fetchMatches('/', MatchStatus.completed);
   }
 
-  Future<List<CricketMatch>> _scrapeMatches(
+  Future<List<CricketMatch>> _fetchMatches(
     String path,
     MatchStatus status,
   ) async {
@@ -59,13 +59,11 @@ class CrexDataSource implements CricketDataSource {
       final results = matchCards
           .map((card) {
             try {
-              // Extract match link and ID
               final link = card.attributes['href'] ?? '';
               final matchId = link.split(
                 '/',
               )[2]; // Get ID from /scoreboard/ID/...
 
-              // Extract series name
               final seriesLink = card.querySelector('a[href*="/series/"]');
               String seriesName = 'International';
               if (seriesLink != null) {
@@ -277,7 +275,7 @@ class CrexDataSource implements CricketDataSource {
 
       return filtered.isEmpty ? _getFallbackMatches(status) : filtered;
     } catch (e) {
-      print('Error scraping Crex: $e');
+      print('Error fetching Crex: $e');
       return _getFallbackMatches(status);
     }
   }
@@ -306,44 +304,13 @@ class CrexDataSource implements CricketDataSource {
   }
 
   List<CricketMatch> _getFallbackMatches(MatchStatus status) {
-    if (status == MatchStatus.live) {
-      return [
-        CricketMatch(
-          id: 'fb_1',
-          title: 'IPL 2026 - Match 1',
-          seriesName: 'Indian Premier League',
-          venue: 'Wankhede Stadium',
-          status: MatchStatus.live,
-          format: MatchFormat.ipl,
-          startTime: DateTime.now(),
-          team1: const Team(
-            id: 'MI',
-            name: 'Mumbai Indians',
-            shortName: 'MI',
-            flagUrl:
-                'https://www.cricbuzz.com/a/img/v1/75x75/i1/c170661/mumbai-indians.jpg',
-            score: '178/4',
-            overs: '18.2',
-          ),
-          team2: const Team(
-            id: 'CSK',
-            name: 'Chennai Super Kings',
-            shortName: 'CSK',
-            flagUrl:
-                'https://www.cricbuzz.com/a/img/v1/75x75/i1/c170623/chennai-super-kings.jpg',
-            score: '175/8',
-            overs: '20.0',
-          ),
-          statusText: 'MI need 10 runs in 10 balls',
-        ),
-      ];
-    }
+    // Return empty list instead of fake matches to avoid confusion
     return [];
   }
 
   @override
   Future<MatchDetail> getMatchDetail(String matchId) async {
-    // Return basic match detail - would need to implement full detail scraping
+    // Return basic match detail - would need to implement full detail fetching
     return MatchDetail(
       match: CricketMatch(
         id: matchId,

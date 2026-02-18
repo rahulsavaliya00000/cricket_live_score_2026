@@ -10,15 +10,19 @@ import 'package:cricketbuzz/core/widgets/shimmer_loader.dart';
 import 'package:cricketbuzz/features/matches/presentation/bloc/match_detail_bloc.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
 import 'package:cricketbuzz/core/widgets/team_flag.dart';
+import 'package:cricketbuzz/core/widgets/empty_state_widget.dart';
 
 class MatchDetailPage extends StatelessWidget {
   final String matchId;
-  const MatchDetailPage({super.key, required this.matchId});
+  final CricketMatch? previewMatch;
+  const MatchDetailPage({super.key, required this.matchId, this.previewMatch});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<MatchDetailBloc>()..add(LoadMatchDetail(matchId)),
+      create: (_) =>
+          sl<MatchDetailBloc>()
+            ..add(LoadMatchDetail(matchId, previewMatch: previewMatch)),
       child: _MatchDetailView(matchId: matchId),
     );
   }
@@ -62,6 +66,8 @@ class _MatchDetailViewState extends State<_MatchDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocBuilder<MatchDetailBloc, MatchDetailState>(
       builder: (context, state) {
         if (state.status == MatchDetailStatus.loading) {
@@ -98,8 +104,17 @@ class _MatchDetailViewState extends State<_MatchDetailView> {
                     background: _MatchHeader(match: match),
                   ),
                   bottom: TabBar(
-                    isScrollable: false,
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
                     dividerColor: Colors.transparent,
+                    labelColor: isDark ? AppColors.primaryGreen : Colors.white,
+                    unselectedLabelColor: isDark
+                        ? Colors.white60
+                        : Colors.white60,
+                    indicatorColor: isDark
+                        ? AppColors.primaryGreen
+                        : Colors.white,
+                    indicatorSize: TabBarIndicatorSize.label,
                     tabs: const [
                       Tab(text: 'Summary'),
                       Tab(text: 'Scorecard'),
@@ -145,7 +160,7 @@ class _MatchHeader extends StatelessWidget {
             ? AppColors.darkCardGradient
             : AppColors.primaryGradient,
       ),
-      padding: const EdgeInsets.fromLTRB(20, 60, 20, 40),
+      padding: const EdgeInsets.fromLTRB(20, 60, 20, 70),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -194,27 +209,26 @@ class _MatchHeader extends StatelessWidget {
               ),
             ],
           ),
-          if (match.statusText != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              match.statusText!,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: AppColors.accentGold,
+          if ((match.result != null && match.result!.isNotEmpty) ||
+              (match.statusText != null && match.statusText!.isNotEmpty)) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(20),
               ),
-            ),
-          ],
-          if (match.result != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              match.result!,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.greenAccent,
+              child: Text(
+                match.result?.isNotEmpty == true
+                    ? match.result!
+                    : match.statusText!,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
           ],
@@ -276,7 +290,19 @@ class _SummaryTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (detail.innings.isEmpty) {
-      return const Center(child: Text('Match yet to begin'));
+      return const CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: EmptyStateWidget(
+              title: 'Match yet to begin',
+              subtitle:
+                  'Detailed summary will appear here once the match starts.',
+              icon: Icons.sports_cricket_outlined,
+            ),
+          ),
+        ],
+      );
     }
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -369,6 +395,20 @@ class _ScorecardTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (innings.isEmpty) {
+      return const CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: EmptyStateWidget(
+              title: 'Scorecard not available',
+              subtitle: 'Scores will be updated here once the match begins.',
+              icon: Icons.article_outlined,
+            ),
+          ),
+        ],
+      );
+    }
     return ListView(
       padding: const EdgeInsets.all(12),
       children: innings.map((inn) {

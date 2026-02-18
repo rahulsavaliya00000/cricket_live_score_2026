@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cricketbuzz/features/auth/domain/entities/user_entity.dart';
 import 'package:cricketbuzz/features/auth/domain/repositories/auth_repository.dart';
 
+import 'package:cricketbuzz/core/error/exceptions.dart';
+
 // ─── Events ──────────────────────────────────────────────
 abstract class AuthEvent extends Equatable {
   @override
@@ -92,6 +94,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await repository.signInWithGoogle();
       emit(Authenticated(user));
+    } on AuthException catch (e) {
+      emit(AuthError(e.message));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -105,6 +109,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await repository.signInAsGuest(event.name);
       emit(Authenticated(user));
+    } on AuthException catch (e) {
+      emit(AuthError(e.message));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -118,6 +124,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await repository.signOut();
       emit(Unauthenticated());
+    } on AuthException catch (e) {
+      emit(AuthError(e.message));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -130,6 +138,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await repository.updateUser(event.user);
       emit(Authenticated(event.user));
+    } on AuthException catch (e) {
+      emit(AuthError(e.message));
     } catch (e) {
       emit(AuthError(e.toString()));
     }

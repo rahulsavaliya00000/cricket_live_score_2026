@@ -7,7 +7,7 @@ import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
 
 /// Mock implementation of CricketDataSource with realistic Indian cricket data.
-/// Replace with real API or web scraper when available.
+/// Replace with real API when available.
 class MockCricketDataSource implements CricketDataSource {
   // ─── Live Matches ────────────────────────────────────────
   @override
@@ -41,33 +41,7 @@ class MockCricketDataSource implements CricketDataSource {
         statusText: 'Day 2 - India lead by 24 runs',
         isFeatured: true,
       ),
-      CricketMatch(
-        id: 'live_2',
-        title: 'Match 45 - MI vs CSK',
-        seriesName: 'Indian Premier League 2026',
-        venue: 'Wankhede Stadium, Mumbai',
-        status: MatchStatus.live,
-        format: MatchFormat.ipl,
-        startTime: DateTime.now().subtract(const Duration(hours: 2)),
-        team1: const Team(
-          id: 't_mi',
-          name: 'Mumbai Indians',
-          shortName: 'MI',
-          flagUrl: 'https://static.cricketlineguru.com/mi.png',
-          score: '178/6',
-          overs: '20.0',
-        ),
-        team2: const Team(
-          id: 't_csk',
-          name: 'Chennai Super Kings',
-          shortName: 'CSK',
-          flagUrl: 'https://static.cricketlineguru.com/csk.png',
-          score: '142/5',
-          overs: '16.4',
-        ),
-        statusText: 'CSK need 37 runs from 20 balls',
-        isFeatured: true,
-      ),
+
       CricketMatch(
         id: 'live_3',
         title: '2nd ODI',

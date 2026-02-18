@@ -9,6 +9,7 @@ import 'package:cricketbuzz/core/widgets/error_view.dart';
 import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
 import 'package:cricketbuzz/core/widgets/team_flag.dart';
+import 'package:cricketbuzz/core/widgets/empty_state_widget.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({super.key});
@@ -132,20 +133,23 @@ class _MatchesPageState extends State<MatchesPage>
               _MatchList(
                 matches: _filter(state.liveMatches),
                 emptyText: 'No live matches right now',
+                emptyIcon: Icons.live_tv_rounded,
               ),
               _MatchList(
                 matches: _filter(state.upcomingMatches),
                 emptyText: 'No upcoming matches',
+                emptyIcon: Icons.event_busy_rounded,
               ),
               _MatchList(
                 matches: _filter(state.recentMatches),
                 emptyText: 'No recent results',
+                emptyIcon: Icons.history_toggle_off_rounded,
               ),
             ],
           );
         },
       ),
-      bottomNavigationBar: _BannerAdPlaceholder(),
+      // bottomNavigationBar: _BannerAdPlaceholder(), // Removed as per request
     );
   }
 }
@@ -153,29 +157,21 @@ class _MatchesPageState extends State<MatchesPage>
 class _MatchList extends StatelessWidget {
   final List<CricketMatch> matches;
   final String emptyText;
-  const _MatchList({required this.matches, required this.emptyText});
+  final IconData? emptyIcon;
+
+  const _MatchList({
+    required this.matches,
+    required this.emptyText,
+    this.emptyIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
     if (matches.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.sports_cricket_outlined,
-              size: 48,
-              color: Theme.of(context).textTheme.bodySmall?.color,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              emptyText,
-              style: GoogleFonts.poppins(
-                color: Theme.of(context).textTheme.bodySmall?.color,
-              ),
-            ),
-          ],
-        ),
+      return EmptyStateWidget(
+        title: emptyText,
+        subtitle: 'Check back later for updates',
+        icon: emptyIcon ?? Icons.sports_cricket_outlined,
       );
     }
     return ListView.builder(
@@ -197,7 +193,7 @@ class _MatchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
-      onTap: () => context.push('/match/${match.id}'),
+      onTap: () => context.push('/match/${match.id}', extra: match),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         padding: const EdgeInsets.all(14),
@@ -333,45 +329,6 @@ class _MatchCard extends StatelessWidget {
               ),
             ],
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BannerAdPlaceholder extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      width: double.infinity,
-      height: 60,
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.white,
-        border: Border(
-          top: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
-        ),
-      ),
-      child: Center(
-        child: Container(
-          width: 320,
-          height: 50,
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.grey[200],
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: const Center(
-            child: Text(
-              'BANNER AD PLACEHOLDER (320x50)',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
         ),
       ),
     );

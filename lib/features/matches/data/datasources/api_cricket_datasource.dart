@@ -7,7 +7,7 @@ import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart'
 import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
 
-class ScraperCricketDataSource implements CricketDataSource {
+class ApiCricketDataSource implements CricketDataSource {
   final http.Client client;
   final String _baseUrl = 'https://www.cricbuzz.com';
   final String _mBaseUrl = 'https://m.cricbuzz.com';
@@ -20,16 +20,16 @@ class ScraperCricketDataSource implements CricketDataSource {
     'Expires': '0',
   };
 
-  ScraperCricketDataSource({required this.client});
+  ApiCricketDataSource({required this.client});
 
   @override
   Future<List<CricketMatch>> getLiveMatches() async {
-    return _scrapeMatches('/cricket-match/live-scores', MatchStatus.live);
+    return _fetchMatches('/cricket-match/live-scores', MatchStatus.live);
   }
 
   @override
   Future<List<CricketMatch>> getUpcomingMatches() async {
-    return _scrapeMatches(
+    return _fetchMatches(
       '/cricket-match/live-scores/upcoming-matches',
       MatchStatus.upcoming,
     );
@@ -37,7 +37,7 @@ class ScraperCricketDataSource implements CricketDataSource {
 
   @override
   Future<List<CricketMatch>> getRecentMatches() async {
-    return _scrapeMatches(
+    return _fetchMatches(
       '/cricket-match/live-scores/recent-matches',
       MatchStatus.completed,
     );
@@ -60,13 +60,17 @@ class ScraperCricketDataSource implements CricketDataSource {
         headers: _headers,
       );
 
-      if (scorecardResponse.statusCode != 200 ||
-          commResponse.statusCode != 200) {
+      if (scorecardResponse.statusCode != 200) {
         throw Exception('Failed to fetch match details from API');
       }
 
       final scorecardJson = json.decode(scorecardResponse.body);
-      final commJson = json.decode(commResponse.body);
+
+      // Commentary might be 204 (No Content) for upcoming matches
+      final commJson =
+          (commResponse.statusCode == 200 && commResponse.body.isNotEmpty)
+          ? json.decode(commResponse.body)
+          : {};
 
       final matchHeader = scorecardJson['matchHeader'] ?? {};
       final team1 = matchHeader['team1'] ?? {};
@@ -223,7 +227,7 @@ class ScraperCricketDataSource implements CricketDataSource {
           ? matchHeader['status']
           : null;
 
-      // Scrape team flag URLs from the squads page (JSON API doesn't include them)
+      // Fetch team flag URLs from the squads page (JSON API doesn't include them)
       String t1FlagUrl = '';
       String t2FlagUrl = '';
       try {
@@ -270,7 +274,7 @@ class ScraperCricketDataSource implements CricketDataSource {
         flagUrl: t2FlagUrl,
       );
 
-      // Check if we need to scrape better names/flags (if defaults returned)
+      // Check if we need to fetch better names/flags (if defaults returned)
       if (t1.name == 'Team 1' ||
           t2.name == 'Team 2' ||
           t1.shortName == 'T1' ||
@@ -315,7 +319,7 @@ class ScraperCricketDataSource implements CricketDataSource {
             }
           }
         } catch (e) {
-          print('Error scraping fallback teams: $e');
+          print('Error fetching fallback teams: $e');
         }
       }
 
@@ -1199,7 +1203,7 @@ class ScraperCricketDataSource implements CricketDataSource {
     }
   }
 
-  Future<List<CricketMatch>> _scrapeMatches(
+  Future<List<CricketMatch>> _fetchMatches(
     String path,
     MatchStatus status,
   ) async {
