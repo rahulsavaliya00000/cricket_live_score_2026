@@ -3,15 +3,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/features/wallet/presentation/bloc/wallet_cubit.dart';
-import 'package:cricketbuzz/features/wallet/data/models/transaction_model.dart';
+import 'package:cricket_live_score/features/wallet/presentation/bloc/wallet_cubit.dart';
+import 'package:cricket_live_score/features/wallet/data/models/transaction_model.dart';
 import 'package:confetti/confetti.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
-import 'package:cricketbuzz/core/services/notification_service.dart';
-import 'package:cricketbuzz/core/services/analytics_service.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/core/services/notification_service.dart';
+import 'package:cricket_live_score/core/services/analytics_service.dart';
 
 // ── Data ────────────────────────────────────────────────────────
 class SpinItem {

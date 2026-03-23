@@ -245,7 +245,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get sendSuggestion => 'யோசனை அனுப்பு';
 
   @override
-  String get helpUsImprove => 'CricketBuzz ஐ மேம்படுத்த உதவுங்கள்';
+  String get helpUsImprove => 'Cricket Live Score ஐ மேம்படுத்த உதவுங்கள்';
 
   @override
   String get setupGuestNickname => 'விருந்தினர் பெயர் அமை';

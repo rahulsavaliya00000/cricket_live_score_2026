@@ -7,35 +7,35 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cricketbuzz/l10n/app_localizations.dart';
+import 'package:cricket_live_score/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cricketbuzz/core/di/injection_container.dart';
-import 'package:cricketbuzz/core/router/app_router.dart';
-import 'package:cricketbuzz/core/theme/app_theme.dart';
-import 'package:cricketbuzz/core/theme/theme_bloc.dart';
-import 'package:cricketbuzz/core/widgets/update_required_screen.dart';
+import 'package:cricket_live_score/core/di/injection_container.dart';
+import 'package:cricket_live_score/core/router/app_router.dart';
+import 'package:cricket_live_score/core/theme/app_theme.dart';
+import 'package:cricket_live_score/core/theme/theme_bloc.dart';
+import 'package:cricket_live_score/core/widgets/update_required_screen.dart';
 import 'package:upgrader/upgrader.dart';
-import 'package:cricketbuzz/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
-import 'package:cricketbuzz/features/players/presentation/bloc/players_bloc.dart';
-import 'package:cricketbuzz/features/series/presentation/bloc/series_bloc.dart';
-import 'package:cricketbuzz/features/wallet/presentation/bloc/wallet_cubit.dart';
-import 'package:cricketbuzz/core/services/notification_service.dart';
-import 'package:cricketbuzz/core/widgets/connectivity_wrapper.dart';
-import 'package:cricketbuzz/core/widgets/maintenance_screen.dart';
-import 'package:cricketbuzz/firebase_options.dart';
-import 'package:cricketbuzz/core/constants/app_constants.dart';
+import 'package:cricket_live_score/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cricket_live_score/features/home/presentation/bloc/home_bloc.dart';
+import 'package:cricket_live_score/features/players/presentation/bloc/players_bloc.dart';
+import 'package:cricket_live_score/features/series/presentation/bloc/series_bloc.dart';
+import 'package:cricket_live_score/features/wallet/presentation/bloc/wallet_cubit.dart';
+import 'package:cricket_live_score/core/services/notification_service.dart';
+import 'package:cricket_live_score/core/widgets/connectivity_wrapper.dart';
+import 'package:cricket_live_score/core/widgets/maintenance_screen.dart';
+import 'package:cricket_live_score/firebase_options.dart';
+import 'package:cricket_live_score/core/constants/app_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
-import 'package:cricketbuzz/core/widgets/ad_free_dialog.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/core/widgets/ad_free_dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:cricketbuzz/features/profile/presentation/bloc/premium_bloc.dart';
-import 'package:cricketbuzz/core/services/revenue_cat_service.dart';
-import 'package:cricketbuzz/core/services/remote_config_service.dart';
-import 'package:cricketbuzz/core/services/analytics_service.dart';
+import 'package:cricket_live_score/features/profile/presentation/bloc/premium_bloc.dart';
+import 'package:cricket_live_score/core/services/revenue_cat_service.dart';
+import 'package:cricket_live_score/core/services/remote_config_service.dart';
+import 'package:cricket_live_score/core/services/analytics_service.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:cricketbuzz/core/services/install_counter_service.dart';
+import 'package:cricket_live_score/core/services/install_counter_service.dart';
 
 void main() {
   // Run all initialization inside a single zone so the Flutter bindings
@@ -340,7 +340,7 @@ class _AppViewState extends State<AppView> with WidgetsBindingObserver {
           child: BlocBuilder<ThemeBloc, ThemeState>(
             builder: (context, themeState) {
               return MaterialApp.router(
-                title: 'CricketBuzz',
+                title: 'Cricket Live Score',
                 debugShowCheckedModeBanner: false,
                 theme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,

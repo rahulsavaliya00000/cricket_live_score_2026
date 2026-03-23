@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:cricketbuzz/features/ugc/domain/entities/ugc_post_entity.dart';
-import 'package:cricketbuzz/features/ugc/data/repositories/ugc_repository.dart';
+import 'package:cricket_live_score/features/ugc/domain/entities/ugc_post_entity.dart';
+import 'package:cricket_live_score/features/ugc/data/repositories/ugc_repository.dart';
 
 part 'ugc_state.dart';
 

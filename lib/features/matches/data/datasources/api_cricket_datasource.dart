@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
-import 'package:cricketbuzz/features/matches/data/datasources/cricket_datasource.dart';
-import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
-import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart';
-import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
-import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
-import 'package:cricketbuzz/core/services/remote_config_service.dart';
+import 'package:cricket_live_score/features/matches/data/datasources/cricket_datasource.dart';
+import 'package:cricket_live_score/features/matches/domain/entities/match_entity.dart';
+import 'package:cricket_live_score/features/players/domain/entities/player_entity.dart';
+import 'package:cricket_live_score/features/players/domain/entities/team_entity.dart';
+import 'package:cricket_live_score/features/series/domain/entities/series_entity.dart';
+import 'package:cricket_live_score/core/services/remote_config_service.dart';
 
 class ApiCricketDataSource implements CricketDataSource {
   final http.Client client;

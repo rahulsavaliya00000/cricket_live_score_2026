@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cricketbuzz/core/constants/app_constants.dart';
-import 'package:cricketbuzz/core/services/revenue_cat_service.dart';
+import 'package:cricket_live_score/core/constants/app_constants.dart';
+import 'package:cricket_live_score/core/services/revenue_cat_service.dart';
 
 // ─── Events ──────────────────────────────────────────────
 abstract class PremiumEvent extends Equatable {

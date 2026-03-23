@@ -243,7 +243,7 @@ class AppLocalizationsTe extends AppLocalizations {
   String get sendSuggestion => 'సూచన పంపండి';
 
   @override
-  String get helpUsImprove => 'CricketBuzz మెరుగుపరచడంలో సహాయపడండి';
+  String get helpUsImprove => 'Cricket Live Score మెరుగుపరచడంలో సహాయపడండి';
 
   @override
   String get setupGuestNickname => 'అతిథి పేరు సెట్ చేయండి';

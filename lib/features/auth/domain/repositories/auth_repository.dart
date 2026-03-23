@@ -1,4 +1,4 @@
-import 'package:cricketbuzz/features/auth/domain/entities/user_entity.dart';
+import 'package:cricket_live_score/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthRepository {
   Future<AppUser> signInWithGoogle();

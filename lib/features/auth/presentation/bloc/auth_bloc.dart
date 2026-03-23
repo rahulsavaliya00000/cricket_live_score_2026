@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cricketbuzz/features/auth/domain/entities/user_entity.dart';
-import 'package:cricketbuzz/features/auth/domain/repositories/auth_repository.dart';
+import 'package:cricket_live_score/features/auth/domain/entities/user_entity.dart';
+import 'package:cricket_live_score/features/auth/domain/repositories/auth_repository.dart';
 
-import 'package:cricketbuzz/core/error/exceptions.dart';
+import 'package:cricket_live_score/core/error/exceptions.dart';
 
 // ─── Events ──────────────────────────────────────────────
 abstract class AuthEvent extends Equatable {

@@ -2,11 +2,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/di/injection_container.dart';
-import 'package:cricketbuzz/core/services/revenue_cat_service.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
-import 'package:cricketbuzz/features/profile/presentation/bloc/premium_bloc.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/di/injection_container.dart';
+import 'package:cricket_live_score/core/services/revenue_cat_service.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/features/profile/presentation/bloc/premium_bloc.dart';
 
 /// Shows the "Go Ad-Free" upsell dialog.
 /// Call [AdFreeDialog.show] from anywhere you have a [BuildContext].

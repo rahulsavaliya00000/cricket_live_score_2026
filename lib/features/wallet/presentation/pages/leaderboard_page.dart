@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/features/wallet/presentation/bloc/leaderboard_cubit.dart';
-import 'package:cricketbuzz/features/wallet/presentation/bloc/leaderboard_state.dart';
-import 'package:cricketbuzz/features/wallet/presentation/bloc/wallet_cubit.dart';
-import 'package:cricketbuzz/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:cricketbuzz/core/di/injection_container.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/features/wallet/presentation/bloc/leaderboard_cubit.dart';
+import 'package:cricket_live_score/features/wallet/presentation/bloc/leaderboard_state.dart';
+import 'package:cricket_live_score/features/wallet/presentation/bloc/wallet_cubit.dart';
+import 'package:cricket_live_score/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cricket_live_score/core/di/injection_container.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
 
 class LeaderboardPage extends StatelessWidget {
   const LeaderboardPage({super.key});

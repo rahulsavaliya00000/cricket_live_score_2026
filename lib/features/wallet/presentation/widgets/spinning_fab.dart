@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
 import 'dart:math' as math;
 
 class SpinningFAB extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
 
 class ErrorView extends StatelessWidget {
   final String message;

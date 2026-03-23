@@ -121,7 +121,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'CricketBuzz'**
+  /// **'Cricket Live Score'**
   String get appName;
 
   /// No description provided for @home.
@@ -589,7 +589,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpUsImprove.
   ///
   /// In en, this message translates to:
-  /// **'Help us improve CricketBuzz'**
+  /// **'Help us improve Cricket Live Score'**
   String get helpUsImprove;
 
   /// No description provided for @setupGuestNickname.

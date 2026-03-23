@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cricketbuzz/features/wallet/presentation/bloc/leaderboard_state.dart';
+import 'package:cricket_live_score/features/wallet/presentation/bloc/leaderboard_state.dart';
 import 'package:uuid/uuid.dart';
 
 class LeaderboardCubit extends Cubit<LeaderboardState> {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
-import 'package:cricketbuzz/core/widgets/team_flag.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricket_live_score/features/matches/domain/entities/match_entity.dart';
+import 'package:cricket_live_score/core/widgets/team_flag.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
 
 class PipScoreOverlay extends StatelessWidget {
   final CricketMatch match;

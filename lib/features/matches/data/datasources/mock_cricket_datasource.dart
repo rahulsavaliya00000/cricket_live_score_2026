@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:cricketbuzz/features/matches/data/datasources/cricket_datasource.dart';
-import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
-import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart';
-import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
-import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
+import 'package:cricket_live_score/features/matches/data/datasources/cricket_datasource.dart';
+import 'package:cricket_live_score/features/matches/domain/entities/match_entity.dart';
+import 'package:cricket_live_score/features/players/domain/entities/player_entity.dart';
+import 'package:cricket_live_score/features/players/domain/entities/team_entity.dart';
+import 'package:cricket_live_score/features/series/domain/entities/series_entity.dart';
 
 /// Mock implementation of CricketDataSource with realistic Indian cricket data.
 /// Replace with real API when available.

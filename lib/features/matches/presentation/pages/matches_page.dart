@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
-import 'package:cricketbuzz/core/widgets/shimmer_loader.dart';
-import 'package:cricketbuzz/core/widgets/error_view.dart';
-import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
-import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
-import 'package:cricketbuzz/core/widgets/team_flag.dart';
-import 'package:cricketbuzz/core/widgets/empty_state_widget.dart';
-import 'package:cricketbuzz/core/widgets/native_ad_widget.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/core/widgets/shimmer_loader.dart';
+import 'package:cricket_live_score/core/widgets/error_view.dart';
+import 'package:cricket_live_score/features/home/presentation/bloc/home_bloc.dart';
+import 'package:cricket_live_score/features/matches/domain/entities/match_entity.dart';
+import 'package:cricket_live_score/core/widgets/team_flag.dart';
+import 'package:cricket_live_score/core/widgets/empty_state_widget.dart';
+import 'package:cricket_live_score/core/widgets/native_ad_widget.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({super.key});

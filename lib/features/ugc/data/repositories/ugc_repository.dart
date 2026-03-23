@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cricketbuzz/features/ugc/domain/entities/ugc_post_entity.dart';
+import 'package:cricket_live_score/features/ugc/domain/entities/ugc_post_entity.dart';
 
 class UGCRepository {
   final FirebaseFirestore _firestore;

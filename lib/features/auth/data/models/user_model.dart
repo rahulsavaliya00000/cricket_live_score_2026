@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cricketbuzz/features/auth/domain/entities/user_entity.dart';
+import 'package:cricket_live_score/features/auth/domain/entities/user_entity.dart';
 
 class UserModel extends AppUser {
   const UserModel({

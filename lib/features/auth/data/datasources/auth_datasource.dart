@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cricketbuzz/core/constants/app_constants.dart';
-import 'package:cricketbuzz/core/error/exceptions.dart';
-import 'package:cricketbuzz/features/auth/data/models/user_model.dart';
-import 'package:cricketbuzz/features/auth/domain/entities/user_entity.dart';
+import 'package:cricket_live_score/core/constants/app_constants.dart';
+import 'package:cricket_live_score/core/error/exceptions.dart';
+import 'package:cricket_live_score/features/auth/data/models/user_model.dart';
+import 'package:cricket_live_score/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthDataSource {
   Future<UserModel> signInWithGoogle();

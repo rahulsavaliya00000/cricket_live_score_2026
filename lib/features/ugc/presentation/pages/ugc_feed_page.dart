@@ -4,10 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/services/remote_config_service.dart';
-import 'package:cricketbuzz/features/ugc/presentation/cubit/ugc_cubit.dart';
-import 'package:cricketbuzz/features/ugc/domain/entities/ugc_post_entity.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/services/remote_config_service.dart';
+import 'package:cricket_live_score/features/ugc/presentation/cubit/ugc_cubit.dart';
+import 'package:cricket_live_score/features/ugc/domain/entities/ugc_post_entity.dart';
 import '../../../../core/utils/ad_helper.dart';
 import 'ugc_webview_page.dart';
 

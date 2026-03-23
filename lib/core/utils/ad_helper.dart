@@ -5,9 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:cricketbuzz/core/di/injection_container.dart';
-import 'package:cricketbuzz/core/services/revenue_cat_service.dart';
-import 'package:cricketbuzz/core/services/remote_config_service.dart';
+import 'package:cricket_live_score/core/di/injection_container.dart';
+import 'package:cricket_live_score/core/services/revenue_cat_service.dart';
+import 'package:cricket_live_score/core/services/remote_config_service.dart';
 import 'package:gma_mediation_unity/gma_mediation_unity.dart';
 import 'package:gma_mediation_ironsource/gma_mediation_ironsource.dart';
 
@@ -992,7 +992,7 @@ class _PremiumPromoDialogState extends State<_PremiumPromoDialog> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Enjoying CricketBuzz?',
+              'Enjoying Cricket Live Score?',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

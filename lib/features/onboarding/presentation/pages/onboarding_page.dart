@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cricketbuzz/core/constants/app_constants.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
-import 'package:cricketbuzz/core/widgets/native_ad_widget.dart';
-import 'package:cricketbuzz/core/services/analytics_service.dart';
+import 'package:cricket_live_score/core/constants/app_constants.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/core/widgets/native_ad_widget.dart';
+import 'package:cricket_live_score/core/services/analytics_service.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -33,7 +33,7 @@ class _OnboardingPageState extends State<OnboardingPage>
 
   final List<OnboardingItem> _pages = [
     OnboardingItem(
-      title: 'Welcome to CricketBuzz',
+      title: 'Welcome to Cricket Live Score',
       description:
           'Your one-stop destination for live scores, ball-by-ball updates, and in-depth cricket coverage.',
       imagePath: 'assets/images/tour_welcome.png',

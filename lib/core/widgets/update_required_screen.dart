@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/constants/app_constants.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/constants/app_constants.dart';
 
 class UpdateRequiredScreen extends StatelessWidget {
   const UpdateRequiredScreen({super.key});

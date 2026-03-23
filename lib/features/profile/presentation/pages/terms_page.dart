@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
 
 class TermsPage extends StatelessWidget {
   const TermsPage({super.key});
@@ -45,12 +45,12 @@ class TermsPage extends StatelessWidget {
             const SizedBox(height: 24),
             _sectionTitle('1. Acceptance of Terms', textColor),
             _paragraph(
-              'By downloading, installing, or using CricketBuzz ("the App"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the App.',
+              'By downloading, installing, or using Cricket Live Score ("the App"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the App.',
               textColor,
             ),
             _sectionTitle('2. Nature of the App', textColor),
             _paragraph(
-              'CricketBuzz is a cricket scores, news, and entertainment application. The App provides:\n\n'
+              'Cricket Live Score is a cricket scores, news, and entertainment application. The App provides:\n\n'
               '• Live and upcoming cricket match scores\n'
               '• Player and series statistics\n'
               '• Cricket news and updates\n'
@@ -60,7 +60,7 @@ class TermsPage extends StatelessWidget {
             ),
             _sectionTitle('3. Virtual Rewards', textColor),
             _paragraph(
-              'CricketBuzz may award virtual items such as coins, balls, or collectibles as part of its entertainment features. These virtual items:\n\n'
+              'Cricket Live Score may award virtual items such as coins, balls, or collectibles as part of its entertainment features. These virtual items:\n\n'
               '• Have no monetary value\n'
               '• Cannot be exchanged for real money, goods, or services\n'
               '• Are not transferable outside the App\n'
@@ -83,12 +83,12 @@ class TermsPage extends StatelessWidget {
             ),
             _sectionTitle('6. Subscriptions & Payments', textColor),
             _paragraph(
-              'CricketBuzz offers an optional Premium subscription that removes advertisements and unlocks additional features. Subscriptions are managed through the Google Play Store and are subject to Google\'s billing terms. We do not process or store payment card information.',
+              'Cricket Live Score offers an optional Premium subscription that removes advertisements and unlocks additional features. Subscriptions are managed through the Google Play Store and are subject to Google\'s billing terms. We do not process or store payment card information.',
               textColor,
             ),
             _sectionTitle('7. Content Ownership', textColor),
             _paragraph(
-              'All content within the App, including text, graphics, logos, and software, is the property of CricketBuzz or its licensors and is protected by applicable intellectual property laws. You may not reproduce or redistribute any content without written permission.',
+              'All content within the App, including text, graphics, logos, and software, is the property of Cricket Live Score or its licensors and is protected by applicable intellectual property laws. You may not reproduce or redistribute any content without written permission.',
               textColor,
             ),
             _sectionTitle('8. Disclaimers', textColor),
@@ -109,7 +109,7 @@ class TermsPage extends StatelessWidget {
             const SizedBox(height: 40),
             Center(
               child: Text(
-                '© 2026 CricketBuzz. All rights reserved.',
+                '© 2026 Cricket Live Score. All rights reserved.',
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   color: textColor.withValues(alpha: 0.4),

@@ -1,7 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cricketbuzz/core/di/injection_container.dart';
+import 'package:cricket_live_score/core/di/injection_container.dart';
 
 /// Thin wrapper around [FirebaseAnalytics].
 ///

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
@@ -45,7 +45,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             const SizedBox(height: 24),
             _sectionTitle('1. Information We Collect', textColor),
             _paragraph(
-              'CricketBuzz collects only the minimum information needed to provide a great cricket experience:\n\n'
+              'Cricket Live Score collects only the minimum information needed to provide a great cricket experience:\n\n'
               '• Account Information: Name and email address when you sign in with Google.\n'
               '• Device Information: Device model and OS version to optimise app performance.\n'
               '• Usage Data: Pages visited and features used, collected anonymously to help us improve the app.\n'
@@ -64,13 +64,13 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             _sectionTitle('3. No Real-Money or Gambling Activities', textColor),
             _paragraph(
-              'CricketBuzz is a free cricket scores and news app. It does not involve any real-money transactions, betting, wagering, or gambling of any kind.\n\n'
+              'Cricket Live Score is a free cricket scores and news app. It does not involve any real-money transactions, betting, wagering, or gambling of any kind.\n\n'
               'Any in-app rewards (coins, collectibles) are purely virtual, have no monetary value, cannot be exchanged for real money or prizes, and are provided solely for entertainment within the app.',
               textColor,
             ),
             _sectionTitle('4. Advertising', textColor),
             _paragraph(
-              'We display non-personalised advertisements through Google AdMob to keep the app free. These ads do not use sensitive personal data. You can remove all ads by upgrading to CricketBuzz Premium.',
+              'We display non-personalised advertisements through Google AdMob to keep the app free. These ads do not use sensitive personal data. You can remove all ads by upgrading to Cricket Live Score Premium.',
               textColor,
             ),
             _sectionTitle('5. Data Security', textColor),
@@ -89,7 +89,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             _sectionTitle('7. Children\'s Privacy', textColor),
             _paragraph(
-              'CricketBuzz is not directed at children under 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us and we will delete it promptly.',
+              'Cricket Live Score is not directed at children under 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us and we will delete it promptly.',
               textColor,
             ),
             _sectionTitle('8. Your Rights', textColor),
@@ -105,7 +105,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             const SizedBox(height: 40),
             Center(
               child: Text(
-                '© 2026 CricketBuzz. All rights reserved.',
+                '© 2026 Cricket Live Score. All rights reserved.',
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   color: textColor.withValues(alpha: 0.4),

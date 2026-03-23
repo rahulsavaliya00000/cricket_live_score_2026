@@ -5,10 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/di/injection_container.dart';
-import 'package:cricketbuzz/features/ugc/data/repositories/ugc_repository.dart';
-import 'package:cricketbuzz/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/di/injection_container.dart';
+import 'package:cricket_live_score/features/ugc/data/repositories/ugc_repository.dart';
+import 'package:cricket_live_score/features/auth/presentation/bloc/auth_bloc.dart';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({super.key});

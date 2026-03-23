@@ -243,7 +243,7 @@ class AppLocalizationsGu extends AppLocalizations {
   String get sendSuggestion => 'સૂચન મોકલો';
 
   @override
-  String get helpUsImprove => 'CricketBuzz ને સુધારવામાં મદદ કરો';
+  String get helpUsImprove => 'Cricket Live Score ને સુધારવામાં મદદ કરો';
 
   @override
   String get setupGuestNickname => 'ગેસ્ટ નામ સેટ કરો';

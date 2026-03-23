@@ -243,7 +243,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get sendSuggestion => 'تجویز بھیجیں';
 
   @override
-  String get helpUsImprove => 'CricketBuzz کو بہتر بنانے میں مدد کریں';
+  String get helpUsImprove => 'Cricket Live Score کو بہتر بنانے میں مدد کریں';
 
   @override
   String get setupGuestNickname => 'مہمان نام ترتیب دیں';

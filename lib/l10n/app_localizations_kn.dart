@@ -243,7 +243,7 @@ class AppLocalizationsKn extends AppLocalizations {
   String get sendSuggestion => 'ಸಲಹೆ ಕಳುಹಿಸಿ';
 
   @override
-  String get helpUsImprove => 'CricketBuzz ಸುಧಾರಿಸಲು ಸಹಾಯ ಮಾಡಿ';
+  String get helpUsImprove => 'Cricket Live Score ಸುಧಾರಿಸಲು ಸಹಾಯ ಮಾಡಿ';
 
   @override
   String get setupGuestNickname => 'ಅತಿಥಿ ಹೆಸರು ಹೊಂದಿಸಿ';

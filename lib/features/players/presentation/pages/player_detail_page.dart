@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart';
-import 'package:cricketbuzz/features/players/presentation/bloc/players_bloc.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/features/players/domain/entities/player_entity.dart';
+import 'package:cricket_live_score/features/players/presentation/bloc/players_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';

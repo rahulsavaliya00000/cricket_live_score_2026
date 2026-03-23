@@ -244,7 +244,7 @@ class AppLocalizationsMl extends AppLocalizations {
   String get sendSuggestion => 'നിർദ്ദേശം അയക്കൂ';
 
   @override
-  String get helpUsImprove => 'CricketBuzz മെച്ചപ്പെടുത്താൻ സഹായിക്കൂ';
+  String get helpUsImprove => 'Cricket Live Score മെച്ചപ്പെടുത്താൻ സഹായിക്കൂ';
 
   @override
   String get setupGuestNickname => 'ഗസ്റ്റ് പേര് സജ്ജമാക്കൂ';

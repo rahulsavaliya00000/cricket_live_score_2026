@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
 
 class MaintenanceScreen extends StatelessWidget {
   const MaintenanceScreen({super.key});
@@ -51,7 +51,7 @@ class MaintenanceScreen extends StatelessWidget {
               const SizedBox(height: 16),
               // Subtitle
               Text(
-                "CricketBuzz is currently undergoing scheduled maintenance to improve your experience.\n\nPlease check back soon.",
+                "Cricket Live Score is currently undergoing scheduled maintenance to improve your experience.\n\nPlease check back soon.",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 15,

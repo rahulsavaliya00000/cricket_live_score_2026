@@ -1,5 +1,5 @@
-name: cricketbuzz
-description: "CricketBuzz - Live Cricket Scores & Stats"
+name: cricket_live_score
+description: "Cricket Live Score: IPL 2026 - Live Cricket Scores & Stats"
 publish_to: 'none'
 version: 1.0.0+1
 

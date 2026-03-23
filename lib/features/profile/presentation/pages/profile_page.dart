@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/constants/app_constants.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
-import 'package:cricketbuzz/l10n/app_localizations.dart';
-import 'package:cricketbuzz/core/theme/theme_bloc.dart';
-import 'package:cricketbuzz/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/constants/app_constants.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/l10n/app_localizations.dart';
+import 'package:cricket_live_score/core/theme/theme_bloc.dart';
+import 'package:cricket_live_score/features/auth/presentation/bloc/auth_bloc.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -548,7 +548,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   // ─── App Version Footer ────────────
                   Center(
                     child: Text(
-                      'CricketBuzz v${AppConstants.appVersion}',
+                      'Cricket Live Score v${AppConstants.appVersion}',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: isDark

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
-import 'package:cricketbuzz/core/widgets/shimmer_loader.dart';
-import 'package:cricketbuzz/core/widgets/error_view.dart';
-import 'package:cricketbuzz/features/series/presentation/bloc/series_bloc.dart';
-import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
-import 'package:cricketbuzz/core/widgets/native_ad_widget.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/core/widgets/shimmer_loader.dart';
+import 'package:cricket_live_score/core/widgets/error_view.dart';
+import 'package:cricket_live_score/features/series/presentation/bloc/series_bloc.dart';
+import 'package:cricket_live_score/features/series/domain/entities/series_entity.dart';
+import 'package:cricket_live_score/core/widgets/native_ad_widget.dart';
 
 class SeriesPage extends StatefulWidget {
   const SeriesPage({super.key});

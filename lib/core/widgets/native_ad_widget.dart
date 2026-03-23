@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cricketbuzz/features/profile/presentation/bloc/premium_bloc.dart';
+import 'package:cricket_live_score/features/profile/presentation/bloc/premium_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 enum NativeAdStyle {

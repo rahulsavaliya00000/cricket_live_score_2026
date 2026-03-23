@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
+import 'package:cricket_live_score/features/matches/domain/entities/match_entity.dart';
 
 class Series extends Equatable {
   final String id;

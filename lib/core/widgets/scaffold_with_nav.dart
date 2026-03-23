@@ -1,13 +1,13 @@
-import 'package:cricketbuzz/l10n/app_localizations.dart';
+import 'package:cricket_live_score/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_pip/fl_pip.dart';
-import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
-import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
-import 'package:cricketbuzz/features/profile/presentation/bloc/premium_bloc.dart';
-import 'package:cricketbuzz/core/widgets/pip_score_overlay.dart';
+import 'package:cricket_live_score/features/home/presentation/bloc/home_bloc.dart';
+import 'package:cricket_live_score/features/matches/domain/entities/match_entity.dart';
+import 'package:cricket_live_score/features/profile/presentation/bloc/premium_bloc.dart';
+import 'package:cricket_live_score/core/widgets/pip_score_overlay.dart';
 
 class ScaffoldWithNav extends StatefulWidget {
   final Widget child;

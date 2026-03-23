@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "CricketBuzz",
+  "appName": "Cricket Live Score",
   "home": "Home",
   "matches": "Matches",
   "series": "Series",
@@ -78,7 +78,7 @@
   "spinAndWin": "Spin & Win",
   "spinAndWinSubtitle": "Try your luck for daily rewards",
   "sendSuggestion": "Send a Suggestion",
-  "helpUsImprove": "Help us improve CricketBuzz",
+  "helpUsImprove": "Help us improve Cricket Live Score",
   "setupGuestNickname": "Setup Guest Nickname",
   "updatingScores": "Updating scores...",
   "tapBackToExit": "Tap back again to exit",

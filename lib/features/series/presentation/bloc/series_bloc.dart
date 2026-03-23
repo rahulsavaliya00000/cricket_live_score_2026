@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cricketbuzz/features/matches/data/repositories/cricket_repository.dart';
-import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
+import 'package:cricket_live_score/features/matches/data/repositories/cricket_repository.dart';
+import 'package:cricket_live_score/features/series/domain/entities/series_entity.dart';
 
 // ─── Events ──────────────────────────────────────────────
 abstract class SeriesEvent extends Equatable {

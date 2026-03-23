@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cricketbuzz/features/matches/data/repositories/cricket_repository.dart';
-import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart';
-import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
+import 'package:cricket_live_score/features/matches/data/repositories/cricket_repository.dart';
+import 'package:cricket_live_score/features/players/domain/entities/player_entity.dart';
+import 'package:cricket_live_score/features/players/domain/entities/team_entity.dart';
 
 // ─── Events ──────────────────────────────────────────────
 abstract class PlayersEvent extends Equatable {

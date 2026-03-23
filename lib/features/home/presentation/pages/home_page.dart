@@ -5,25 +5,25 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/constants/app_constants.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
-import 'package:cricketbuzz/core/widgets/shimmer_loader.dart';
-import 'package:cricketbuzz/core/widgets/error_view.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/constants/app_constants.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/core/widgets/shimmer_loader.dart';
+import 'package:cricket_live_score/core/widgets/error_view.dart';
 
-import 'package:cricketbuzz/l10n/app_localizations.dart';
-import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
-import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
-import 'package:cricketbuzz/core/services/notification_service.dart';
-import 'package:cricketbuzz/core/widgets/team_flag.dart';
-import 'package:cricketbuzz/core/widgets/native_ad_widget.dart';
-import 'package:cricketbuzz/features/wallet/presentation/widgets/wallet_chip.dart';
-import 'package:cricketbuzz/features/wallet/presentation/widgets/spinning_fab.dart';
-import 'package:cricketbuzz/features/wallet/presentation/bloc/wallet_cubit.dart';
-import 'package:cricketbuzz/features/profile/presentation/bloc/premium_bloc.dart';
-import 'package:cricketbuzz/features/home/presentation/widgets/live_feed_button.dart';
-import 'package:cricketbuzz/features/home/presentation/widgets/ipl_schedule_button.dart';
-import 'package:cricketbuzz/core/services/remote_config_service.dart';
+import 'package:cricket_live_score/l10n/app_localizations.dart';
+import 'package:cricket_live_score/features/home/presentation/bloc/home_bloc.dart';
+import 'package:cricket_live_score/features/matches/domain/entities/match_entity.dart';
+import 'package:cricket_live_score/core/services/notification_service.dart';
+import 'package:cricket_live_score/core/widgets/team_flag.dart';
+import 'package:cricket_live_score/core/widgets/native_ad_widget.dart';
+import 'package:cricket_live_score/features/wallet/presentation/widgets/wallet_chip.dart';
+import 'package:cricket_live_score/features/wallet/presentation/widgets/spinning_fab.dart';
+import 'package:cricket_live_score/features/wallet/presentation/bloc/wallet_cubit.dart';
+import 'package:cricket_live_score/features/profile/presentation/bloc/premium_bloc.dart';
+import 'package:cricket_live_score/features/home/presentation/widgets/live_feed_button.dart';
+import 'package:cricket_live_score/features/home/presentation/widgets/ipl_schedule_button.dart';
+import 'package:cricket_live_score/core/services/remote_config_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       _isTourRunning = true;
-      _tourMessage = 'Welcome to CricketBuzz! Let\'s explore the matches...';
+      _tourMessage = 'Welcome to Cricket Live Score! Let\'s explore the matches...';
     });
 
     await Future.delayed(const Duration(seconds: 2));
@@ -440,7 +440,7 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         Flexible(
                                           child: Text(
-                                            'CricketBuzz',
+                                            'Cricket Live Score',
                                             style: GoogleFonts.poppins(
                                               fontSize: 20,
                                               fontWeight: FontWeight.w700,

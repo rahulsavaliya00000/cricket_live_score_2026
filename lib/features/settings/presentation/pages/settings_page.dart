@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
-import 'package:cricketbuzz/core/theme/theme_bloc.dart';
-import 'package:cricketbuzz/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:cricketbuzz/core/utils/ad_helper.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/theme/theme_bloc.dart';
+import 'package:cricket_live_score/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cricket_live_score/core/utils/ad_helper.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:cricketbuzz/core/services/notification_service.dart';
+import 'package:cricket_live_score/core/services/notification_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -343,7 +343,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'CricketBuzz',
+                                'Cricket Live Score',
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

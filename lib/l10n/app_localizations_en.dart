@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'CricketBuzz';
+  String get appName => 'Cricket Live Score';
 
   @override
   String get home => 'Home';
@@ -243,7 +243,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendSuggestion => 'Send a Suggestion';
 
   @override
-  String get helpUsImprove => 'Help us improve CricketBuzz';
+  String get helpUsImprove => 'Help us improve Cricket Live Score';
 
   @override
   String get setupGuestNickname => 'Setup Guest Nickname';

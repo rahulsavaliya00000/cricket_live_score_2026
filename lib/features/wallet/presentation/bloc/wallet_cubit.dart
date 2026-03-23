@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cricketbuzz/features/wallet/data/models/transaction_model.dart';
-import 'package:cricketbuzz/core/constants/app_constants.dart';
+import 'package:cricket_live_score/features/wallet/data/models/transaction_model.dart';
+import 'package:cricket_live_score/core/constants/app_constants.dart';
 import 'package:uuid/uuid.dart';
 
 part 'wallet_state.dart';

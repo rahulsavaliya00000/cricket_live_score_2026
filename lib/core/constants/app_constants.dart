@@ -1,10 +1,10 @@
 // App-wide constants
-import 'package:cricketbuzz/core/services/remote_config_service.dart';
+import 'package:cricket_live_score/core/services/remote_config_service.dart';
 
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'CricketBuzz';
+  static const String appName = 'Cricket Live Score';
   static const String appVersion = '1.0.0+15';
 
   // Cache durations

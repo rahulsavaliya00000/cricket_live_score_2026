@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricket_live_score/core/constants/app_colors.dart';
 
 class SuggestionPage extends StatefulWidget {
   const SuggestionPage({super.key});
@@ -129,7 +129,7 @@ class _SuggestionPageState extends State<SuggestionPage> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Help us improve CricketBuzz by sharing\nyour ideas and suggestions.',
+                    'Help us improve Cricket Live Score by sharing\nyour ideas and suggestions.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontSize: 13,

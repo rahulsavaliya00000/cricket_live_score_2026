@@ -7,16 +7,16 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:cricketbuzz/core/router/app_router.dart';
+import 'package:cricket_live_score/core/router/app_router.dart';
 
 // ─── Native navigation channel (used by NotificationActionReceiver.kt) ───────
 const MethodChannel _navChannel = MethodChannel(
-  'com.qdevix.cricketbuzz/navigation',
+  'com.qdevix.cricket_live_score_2026/navigation',
 );
 
 // ─── Native notification channel (custom RemoteViews notification) ───────────
 const MethodChannel _notifChannel = MethodChannel(
-  'com.qdevix.cricketbuzz/notification',
+  'com.qdevix.cricket_live_score_2026/notification',
 );
 
 /// Background notification tap handler — must be a top-level function.
@@ -462,7 +462,7 @@ class NotificationService {
         htmlFormatBigText: false,
         contentTitle: _dailySpinTitle(),
         htmlFormatContentTitle: false,
-        summaryText: '🏏 CricketBuzz',
+        summaryText: '🏏 Cricket Live Score',
       ),
       actions: <AndroidNotificationAction>[
         AndroidNotificationAction(
@@ -535,7 +535,7 @@ class NotificationService {
         htmlFormatBigText: false,
         contentTitle: _dailySpinTitle(),
         htmlFormatContentTitle: false,
-        summaryText: '🏏 CricketBuzz',
+        summaryText: '🏏 Cricket Live Score',
       ),
       actions: <AndroidNotificationAction>[
         AndroidNotificationAction(
