@@ -115,7 +115,7 @@ void main() {
       // RevenueCat — init SDK and pre-load packages so prices are ready before UI
       final revenueCatService = sl<RevenueCatService>();
       await revenueCatService.init();
-      
+
       // Install Counter — increment global install count once per install
       unawaited(sl<InstallCounterService>().logInstallOnce());
       if (isOnline) {
@@ -206,7 +206,8 @@ class _AppViewState extends State<AppView> with WidgetsBindingObserver {
       // Sync premium flag to AdHelper so all ads are suppressed for premium users.
       // We OR with devPremiumOverride to prevent the initial Bloc state (false)
       // from overriding the startup true value set in main().
-      AdHelper.isPremium = context.read<PremiumBloc>().state.isPremium ||
+      AdHelper.isPremium =
+          context.read<PremiumBloc>().state.isPremium ||
           AppConstants.devPremiumOverride;
 
       if (AppConstants.devShowWalletUI) {
@@ -354,8 +355,11 @@ class _AppViewState extends State<AppView> with WidgetsBindingObserver {
                       RemoteConfigService.instance.underMaintenance;
 
                   // Force Update Check
-                  final currentBuild = int.tryParse(AppConstants.appVersion.split('+')[1]) ?? 0;
-                  final minRequiredBuild = int.tryParse(AppConstants.minAppVersion.split('+')[1]) ?? 0;
+                  final currentBuild =
+                      int.tryParse(AppConstants.appVersion.split('+')[1]) ?? 0;
+                  final minRequiredBuild =
+                      int.tryParse(AppConstants.minAppVersion.split('+')[1]) ??
+                      0;
 
                   bool isUpdateRequired = false;
                   if (AppConstants.forceUpdate) {

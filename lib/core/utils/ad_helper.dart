@@ -34,9 +34,7 @@ class AdHelper {
 
   /// List of test device IDs to enable Ad Inspector and test ads.
   /// Find your ID in the console logs (look for "To get test ads on this device, call...")
-  static List<String> testDeviceIds = [
-    "C0CF96ED36B33E7C0F49654E9544084C",
-  ];
+  static List<String> testDeviceIds = ["C0CF96ED36B33E7C0F49654E9544084C"];
 
   /// Updates the Mobile Ads request configuration with test devices.
   static Future<void> updateTestDevices() async {
@@ -49,10 +47,10 @@ class AdHelper {
   /// Initializes mediation-specific consent and settings.
   static Future<void> initMediation({bool hasConsent = true}) async {
     if (kIsWeb) return;
-    
+
     // Small delay to ensure native plugin channels are fully registered
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     // Unity Ads Mediation consent
     try {
       GmaMediationUnity().setGDPRConsent(hasConsent);
@@ -230,7 +228,9 @@ class AdHelper {
   ) {
     if (isPremium) return;
     int needed = targetCount - cache.length;
-    debugPrint('📊 [AD_QUEUE] _queueFillCache -> Cache size: ${cache.length}/$targetCount. Queuing $needed ads of size $size.');
+    debugPrint(
+      '📊 [AD_QUEUE] _queueFillCache -> Cache size: ${cache.length}/$targetCount. Queuing $needed ads of size $size.',
+    );
     for (int i = 0; i < needed; i++) {
       _adQueue.add(_AdLoadRequest(cache: cache, size: size));
     }
@@ -239,13 +239,17 @@ class AdHelper {
 
   /// Process the next ad in the queue. Only one loads at a time.
   static void _processQueue() {
-    debugPrint('🚦 [AD_QUEUE] _processQueue checking in... is_loading: $_isLoadingAd | queue_length: ${_adQueue.length}');
+    debugPrint(
+      '🚦 [AD_QUEUE] _processQueue checking in... is_loading: $_isLoadingAd | queue_length: ${_adQueue.length}',
+    );
     if (isPremium || _isLoadingAd || _adQueue.isEmpty) return;
     _isLoadingAd = true;
 
     final request = _adQueue.removeAt(0);
     final isCallbackRequest = request.onLoaded != null;
-    debugPrint('⏳ [AD_QUEUE] Loading next ad: size=${request.size}, isCallback=$isCallbackRequest');
+    debugPrint(
+      '⏳ [AD_QUEUE] Loading next ad: size=${request.size}, isCallback=$isCallbackRequest',
+    );
 
     try {
       final ad = BannerAd(
@@ -254,14 +258,18 @@ class AdHelper {
         request: const AdRequest(),
         listener: BannerAdListener(
           onAdLoaded: (loadedAd) {
-            debugPrint('✅ [AD_QUEUE] BannerAd LOADED successfully! (size=${request.size})');
+            debugPrint(
+              '✅ [AD_QUEUE] BannerAd LOADED successfully! (size=${request.size})',
+            );
             _isLoadingAd = false;
             if (isCallbackRequest) {
               request.onLoaded!(loadedAd as BannerAd);
             } else {
               // Only add to cache AFTER the ad is fully loaded
               request.cache.add(loadedAd as BannerAd);
-              debugPrint('📦 [AD_QUEUE] Added ad to cache. New cache size: ${request.cache.length}');
+              debugPrint(
+                '📦 [AD_QUEUE] Added ad to cache. New cache size: ${request.cache.length}',
+              );
             }
             _processQueue(); // Load next in queue
           },
@@ -273,7 +281,9 @@ class AdHelper {
               request.onFailed?.call();
             }
             // Retry after delay, then continue queue
-            debugPrint('⏳ [AD_QUEUE] Retrying queue processing in 5 seconds due to failure...');
+            debugPrint(
+              '⏳ [AD_QUEUE] Retrying queue processing in 5 seconds due to failure...',
+            );
             Future.delayed(const Duration(seconds: 5), () {
               _processQueue();
             });
@@ -288,7 +298,9 @@ class AdHelper {
       ad.load();
       debugPrint('📡 [AD_QUEUE] ad.load() triggered.');
     } catch (e, st) {
-      debugPrint('💥🆘 [AD_QUEUE] CRITICAL EXCEPTION during ad.load(): $e\n$st');
+      debugPrint(
+        '💥🆘 [AD_QUEUE] CRITICAL EXCEPTION during ad.load(): $e\n$st',
+      );
       _isLoadingAd = false;
       _processQueue(); // Don't let the queue die permanently
     }
@@ -323,7 +335,9 @@ class AdHelper {
         : _preloadedSmallBanners;
 
     if (cache.isNotEmpty) {
-      debugPrint('🎁 [AD_POOL] Cache HIT for $size! Returning preloaded ad. (Remaining cache: ${cache.length - 1})');
+      debugPrint(
+        '🎁 [AD_POOL] Cache HIT for $size! Returning preloaded ad. (Remaining cache: ${cache.length - 1})',
+      );
       final preloaded = cache.removeAt(0);
       _fillBannerCaches(); // top up cache
       return preloaded;
@@ -413,8 +427,10 @@ class AdHelper {
   // ─── INTERSTITIAL FREQUENCY ──────────────────────────────────────────────
   // Change _interstitialEvery to control how often interstitial ads show.
   // e.g. 3 = every 3rd navigation, 5 = every 5th navigation, etc.
-  static int get _interstitialEvery => RemoteConfigService.instance.adInterstitialEvery;
-  static int get _premiumPromoEvery => RemoteConfigService.instance.adPremiumPromoEvery;
+  static int get _interstitialEvery =>
+      RemoteConfigService.instance.adInterstitialEvery;
+  static int get _premiumPromoEvery =>
+      RemoteConfigService.instance.adPremiumPromoEvery;
   // ─────────────────────────────────────────────────────────────────────────
 
   static void showInterstitialAd(VoidCallback onAdDismissed) {
@@ -431,7 +447,9 @@ class AdHelper {
 
     // If it's the premium promo turn, show the 'Remove Ads' dialog instead
     if (_requestCount > 0 && _requestCount % _premiumPromoEvery == 0) {
-      print('🎁 AdHelper: Time to show the Premium Promo Dialog (Turn $_requestCount)!');
+      print(
+        '🎁 AdHelper: Time to show the Premium Promo Dialog (Turn $_requestCount)!',
+      );
       final nav = navigatorKey?.currentState;
       if (nav != null && nav.context.mounted) {
         showDialog(
@@ -467,14 +485,16 @@ class AdHelper {
     if (_interstitialAd != null && !_isAdExpired(_interstitialLoadedTime)) {
       _showLoadedInterstitialAd(onAdDismissed);
     } else {
-      print('⚠️ AdHelper: Interstitial not ready/expired - loading with indicator...');
+      print(
+        '⚠️ AdHelper: Interstitial not ready/expired - loading with indicator...',
+      );
       final nav = navigatorKey?.currentState;
       if (nav == null) {
         loadInterstitialAd();
         onAdDismissed();
         return;
       }
-      
+
       nav.push(
         PageRouteBuilder(
           opaque: false,
@@ -489,7 +509,7 @@ class AdHelper {
       void handleResult() {
         if (timerTriggered) return;
         timerTriggered = true;
-        
+
         // Pop the dialog
         nav.pop();
 
@@ -538,7 +558,7 @@ class AdHelper {
 
   static void loadRewardedAd() {
     if (kIsWeb) return;
-    
+
     if (_rewardedAd != null && _isAdExpired(_rewardedLoadedTime)) {
       _rewardedAd?.dispose();
       _rewardedAd = null;
@@ -567,9 +587,9 @@ class AdHelper {
     required Function(RewardItem) onEarnedReward,
     required VoidCallback onAdDismissed,
   }) {
-    // Rewarded ads are mandatory for everyone (including premium) 
+    // Rewarded ads are mandatory for everyone (including premium)
     // because they are used for "Watch & Earn" and "Live Feed unlocking".
-    
+
     if (_rewardedAd != null && !_isAdExpired(_rewardedLoadedTime)) {
       _pushBackBlockOverlay();
       _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
@@ -910,15 +930,15 @@ class _PremiumPromoDialogState extends State<_PremiumPromoDialog> {
 
   Future<void> _purchaseLifetime() async {
     if (_lifetimePackage == null) return;
-    
+
     setState(() => _isPurchasing = true);
-    
+
     final result = await _rcService.purchasePackage(_lifetimePackage!);
-    
+
     if (!mounted) return;
-    
+
     setState(() => _isPurchasing = false);
-    
+
     if (result.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -1005,7 +1025,9 @@ class _PremiumPromoDialogState extends State<_PremiumPromoDialog> {
               'Upgrade to Lifetime Premium and get exclusive access to advanced features.',
               style: TextStyle(
                 fontSize: 13,
-                color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.7),
+                color: (isDark ? Colors.white : Colors.black).withValues(
+                  alpha: 0.7,
+                ),
                 height: 1.4,
               ),
               textAlign: TextAlign.center,
@@ -1016,14 +1038,28 @@ class _PremiumPromoDialogState extends State<_PremiumPromoDialog> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.1),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.grey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
                 children: [
-                  _buildFeatureRow(Icons.block_flipped, 'Lifetime Ad-Free Experience', isDark),
-                  _buildFeatureRow(Icons.picture_in_picture_alt_rounded, 'PIP (Picture in Picture) View', isDark),
-                  _buildFeatureRow(Icons.offline_bolt_rounded, '2 Ball Advanced (Live Highlights)', isDark),
+                  _buildFeatureRow(
+                    Icons.block_flipped,
+                    'Lifetime Ad-Free Experience',
+                    isDark,
+                  ),
+                  _buildFeatureRow(
+                    Icons.picture_in_picture_alt_rounded,
+                    'PIP (Picture in Picture) View',
+                    isDark,
+                  ),
+                  _buildFeatureRow(
+                    Icons.offline_bolt_rounded,
+                    '2 Ball Advanced (Live Highlights)',
+                    isDark,
+                  ),
                 ],
               ),
             ),
@@ -1033,7 +1069,9 @@ class _PremiumPromoDialogState extends State<_PremiumPromoDialog> {
             SizedBox(
               height: 52,
               child: ElevatedButton(
-                onPressed: _isLoading || _isPurchasing ? null : _purchaseLifetime,
+                onPressed: _isLoading || _isPurchasing
+                    ? null
+                    : _purchaseLifetime,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.amber,
                   foregroundColor: Colors.black,
@@ -1054,7 +1092,10 @@ class _PremiumPromoDialogState extends State<_PremiumPromoDialog> {
                       )
                     : Text(
                         'Get Lifetime - $_priceString',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
               ),
             ),
@@ -1066,11 +1107,12 @@ class _PremiumPromoDialogState extends State<_PremiumPromoDialog> {
               child: TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Close dialog
-                  widget.onDismissed(); // Allow the underlying action to continue
+                  widget
+                      .onDismissed(); // Allow the underlying action to continue
                 },
                 style: TextButton.styleFrom(
-                  foregroundColor:
-                      (isDark ? Colors.white : Colors.black).withValues(alpha: 0.5),
+                  foregroundColor: (isDark ? Colors.white : Colors.black)
+                      .withValues(alpha: 0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
