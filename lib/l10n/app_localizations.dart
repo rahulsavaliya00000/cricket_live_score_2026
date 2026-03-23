@@ -567,6 +567,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Predictions'**
   String get predictions;
+
+  /// No description provided for @spinAndWin.
+  ///
+  /// In en, this message translates to:
+  /// **'Spin & Win'**
+  String get spinAndWin;
+
+  /// No description provided for @spinAndWinSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try your luck for daily rewards'**
+  String get spinAndWinSubtitle;
+
+  /// No description provided for @sendSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a Suggestion'**
+  String get sendSuggestion;
+
+  /// No description provided for @helpUsImprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Help us improve CricketBuzz'**
+  String get helpUsImprove;
+
+  /// No description provided for @setupGuestNickname.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Guest Nickname'**
+  String get setupGuestNickname;
+
+  /// No description provided for @updatingScores.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating scores...'**
+  String get updatingScores;
+
+  /// No description provided for @tapBackToExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap back again to exit'**
+  String get tapBackToExit;
+
+  /// No description provided for @adFreeExperience.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad-Free Experience'**
+  String get adFreeExperience;
+
+  /// No description provided for @getLifetimeAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Lifetime Access'**
+  String get getLifetimeAccess;
+
+  /// No description provided for @maybeLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe later'**
+  String get maybeLater;
+
+  /// No description provided for @yetToBat.
+  ///
+  /// In en, this message translates to:
+  /// **'Yet to bat'**
+  String get yetToBat;
 }
 
 class _AppLocalizationsDelegate

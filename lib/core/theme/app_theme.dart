@@ -55,11 +55,13 @@ class AppTheme {
         unselectedItemColor: AppColors.lightTextSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
+        selectedIconTheme: const IconThemeData(size: 26),
+        unselectedIconTheme: const IconThemeData(size: 24),
         selectedLabelStyle: GoogleFonts.poppins(
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: GoogleFonts.poppins(fontSize: 11),
+        unselectedLabelStyle: GoogleFonts.poppins(fontSize: 12),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
@@ -187,11 +189,13 @@ class AppTheme {
         unselectedItemColor: AppColors.darkTextSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
+        selectedIconTheme: const IconThemeData(size: 26),
+        unselectedIconTheme: const IconThemeData(size: 24),
         selectedLabelStyle: GoogleFonts.poppins(
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: GoogleFonts.poppins(fontSize: 11),
+        unselectedLabelStyle: GoogleFonts.poppins(fontSize: 12),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.primaryLight.withValues(alpha: 0.15),

@@ -36,7 +36,7 @@ class TermsPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Last Updated: October 26, 2023',
+              'Last Updated: Feb 27, 2026',
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: textColor.withValues(alpha: 0.6),
@@ -45,38 +45,71 @@ class TermsPage extends StatelessWidget {
             const SizedBox(height: 24),
             _sectionTitle('1. Acceptance of Terms', textColor),
             _paragraph(
-              'By accessing and using CricketBuzz, you accept and agree to be bound by the terms and provision of this agreement.',
+              'By downloading, installing, or using CricketBuzz ("the App"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the App.',
               textColor,
             ),
-            _sectionTitle('2. User Conduct', textColor),
+            _sectionTitle('2. Nature of the App', textColor),
             _paragraph(
-              'You agree to use the app only for lawful purposes. You are prohibited from posting or transmitting any unlawful, threatening, libelous, defamatory, obscene, or profane material.',
+              'CricketBuzz is a cricket scores, news, and entertainment application. The App provides:\n\n'
+              '• Live and upcoming cricket match scores\n'
+              '• Player and series statistics\n'
+              '• Cricket news and updates\n'
+              '• In-app entertainment features such as a virtual spin wheel\n\n'
+              'The App does not offer gambling, betting, wagering, or any real-money gaming of any kind. All in-app features are purely for entertainment.',
               textColor,
             ),
-            _sectionTitle('3. Content Ownership', textColor),
+            _sectionTitle('3. Virtual Rewards', textColor),
             _paragraph(
-              'All content found on or through this app is the property of CricketBuzz or used with permission. You may not distribute, modify, transmit, reuse, download, repost, copy, or use said Content, whether in whole or in part, for commercial purposes.',
+              'CricketBuzz may award virtual items such as coins, balls, or collectibles as part of its entertainment features. These virtual items:\n\n'
+              '• Have no monetary value\n'
+              '• Cannot be exchanged for real money, goods, or services\n'
+              '• Are not transferable outside the App\n'
+              '• May be modified or removed at any time without notice\n\n'
+              'Using entertainment features within the App does not constitute gambling under any applicable law.',
               textColor,
             ),
-            _sectionTitle('4. Termination', textColor),
+            _sectionTitle('4. User Accounts', textColor),
             _paragraph(
-              'We may terminate your access to the app, without cause or notice, which may result in the forfeiture and destruction of all information associated with you.',
+              'You may sign in using your Google account. You are responsible for maintaining the confidentiality of your account and for all activities that occur under it. You agree to notify us immediately of any unauthorised use.',
               textColor,
             ),
-            _sectionTitle('5. Changes to Terms', textColor),
+            _sectionTitle('5. Acceptable Use', textColor),
             _paragraph(
-              'We reserve the right, at our sole discretion, to modify or replace these Terms at any time. What constitutes a material change will be determined at our sole discretion.',
+              'You agree to use the App only for lawful, personal, non-commercial purposes. You must not:\n\n'
+              '• Attempt to reverse-engineer, decompile, or extract the source code of the App\n'
+              '• Attempt to disrupt, overload, or compromise the App\'s servers\n'
+              '• Impersonate any person or entity',
               textColor,
             ),
-            _sectionTitle('6. Contact Us', textColor),
+            _sectionTitle('6. Subscriptions & Payments', textColor),
             _paragraph(
-              'If you have any questions about these Terms, please contact us at legal@cricketbuzz.com.',
+              'CricketBuzz offers an optional Premium subscription that removes advertisements and unlocks additional features. Subscriptions are managed through the Google Play Store and are subject to Google\'s billing terms. We do not process or store payment card information.',
+              textColor,
+            ),
+            _sectionTitle('7. Content Ownership', textColor),
+            _paragraph(
+              'All content within the App, including text, graphics, logos, and software, is the property of CricketBuzz or its licensors and is protected by applicable intellectual property laws. You may not reproduce or redistribute any content without written permission.',
+              textColor,
+            ),
+            _sectionTitle('8. Disclaimers', textColor),
+            _paragraph(
+              'The App is provided "as is" without warranties of any kind. We do not guarantee that scores or data are error-free or uninterrupted. We are not responsible for any decisions made based on information provided by the App.',
+              textColor,
+            ),
+            _sectionTitle('9. Changes to Terms', textColor),
+            _paragraph(
+              'We may update these Terms at any time. Continued use of the App after changes are posted constitutes your acceptance of the revised Terms. We will notify users of material changes via an in-app notice.',
+              textColor,
+            ),
+            _sectionTitle('10. Contact Us', textColor),
+            _paragraph(
+              'If you have any questions about these Terms, please contact us at:\n\nqdevix@gmail.com',
               textColor,
             ),
             const SizedBox(height: 40),
             Center(
               child: Text(
-                '© 2024 CricketBuzz. All rights reserved.',
+                '© 2026 CricketBuzz. All rights reserved.',
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   color: textColor.withValues(alpha: 0.4),

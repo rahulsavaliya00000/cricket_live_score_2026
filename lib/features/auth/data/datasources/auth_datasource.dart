@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cricketbuzz/core/constants/app_constants.dart';
@@ -30,24 +31,38 @@ class AuthDataSourceImpl implements AuthDataSource {
   @override
   Future<UserModel> signInWithGoogle() async {
     try {
+      debugPrint('🔑 [AUTH_DATASOURCE] signInWithGoogle() started...');
       final googleUser = await googleSignIn.signIn();
-      if (googleUser == null) throw AuthException('Google sign in cancelled');
+      if (googleUser == null) {
+        debugPrint('⚠️ [AUTH_DATASOURCE] Google Sign In cancelled by user');
+        throw AuthException('Google sign in cancelled');
+      }
 
+      debugPrint('📡 [AUTH_DATASOURCE] Google User: ${googleUser.email}');
       final googleAuth = await googleUser.authentication;
+      debugPrint('🎫 [AUTH_DATASOURCE] Tokens received (idToken: ${googleAuth.idToken != null})');
+      
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
+      debugPrint('🔥 [AUTH_DATASOURCE] Signing in to Firebase with credential...');
       final userCredential = await firebaseAuth.signInWithCredential(
         credential,
       );
       final user = userCredential.user!;
+      debugPrint('✅ [AUTH_DATASOURCE] Firebase Auth SUCCESS: uid=${user.uid}');
 
       // Check if user already exists in Firestore
+      debugPrint('🔍 [AUTH_DATASOURCE] Checking Firestore for user: ${user.uid}');
       final existingUser = await getUserFromFirestore(user.uid);
-      if (existingUser != null) return existingUser;
+      if (existingUser != null) {
+        debugPrint('💼 [AUTH_DATASOURCE] Existing user found in Firestore');
+        return existingUser;
+      }
 
+      debugPrint('➕ [AUTH_DATASOURCE] New user! Creating record in Firestore...');
       final newUser = UserModel(
         uid: user.uid,
         name: user.displayName ?? 'Cricket Fan',
@@ -58,10 +73,13 @@ class AuthDataSourceImpl implements AuthDataSource {
       );
 
       await saveUserToFirestore(newUser);
+      debugPrint('✨ [AUTH_DATASOURCE] Firestore record created successfully');
       return newUser;
-    } on AuthException {
+    } on AuthException catch (e) {
+      debugPrint('❌ [AUTH_DATASOURCE] AuthException: ${e.message}');
       rethrow;
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('💥 [AUTH_DATASOURCE] CRITICAL ERROR during Google Sign In: $e\n$stack');
       throw AuthException('Google sign in failed: $e');
     }
   }
@@ -81,6 +99,14 @@ class AuthDataSourceImpl implements AuthDataSource {
 
       await saveUserToFirestore(newUser);
       return newUser;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'admin-restricted-operation' ||
+          e.code == 'operation-not-allowed') {
+        throw AuthException(
+          'Guest login is disabled. Please enable "Anonymous" in Firebase Console.',
+        );
+      }
+      throw AuthException(e.message ?? 'Guest sign in failed');
     } catch (e) {
       throw AuthException('Guest sign in failed: $e');
     }

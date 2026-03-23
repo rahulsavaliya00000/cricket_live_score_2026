@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@color/notif_bg">
+
+    <!-- App icon + title row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="6dp">
+
+        <ImageView
+            android:id="@+id/notif_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@mipmap/launcher_icon"
+            android:layout_marginEnd="8dp"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/notif_app_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CricketBuzz"
+            android:textSize="11sp"
+            android:textColor="@color/notif_text_secondary"
+            android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:id="@+id/notif_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="now"
+            android:textSize="11sp"
+            android:textColor="@color/notif_text_secondary" />
+
+    </LinearLayout>
+
+    <!-- Main title -->
+    <TextView
+        android:id="@+id/notif_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🎁 Free Daily Spin Available!"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/notif_text_primary"
+        android:layout_marginBottom="4dp" />
+
+    <!-- Subtitle / body -->
+    <TextView
+        android:id="@+id/notif_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tap Spin Now to win coins, balls &amp; bats!"
+        android:textSize="13sp"
+        android:textColor="@color/notif_text_secondary"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Button row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Spin Now button -->
+        <TextView
+            android:id="@+id/btn_spin_now"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="🎰  Spin Now"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:background="@drawable/btn_spin_now"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Live Match button -->
+        <TextView
+            android:id="@+id/btn_live_match"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="🔴  Live Match"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:background="@drawable/btn_live_match"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+</LinearLayout>

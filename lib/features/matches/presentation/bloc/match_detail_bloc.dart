@@ -12,7 +12,15 @@ abstract class MatchDetailEvent extends Equatable {
 
 class LoadMatchDetail extends MatchDetailEvent {
   final String matchId;
-  LoadMatchDetail(this.matchId);
+  final CricketMatch? previewMatch;
+  LoadMatchDetail(this.matchId, {this.previewMatch});
+  @override
+  List<Object?> get props => [matchId, previewMatch];
+}
+
+class RefreshMatchDetail extends MatchDetailEvent {
+  final String matchId;
+  RefreshMatchDetail(this.matchId);
   @override
   List<Object?> get props => [matchId];
 }
@@ -69,6 +77,7 @@ class MatchDetailBloc extends Bloc<MatchDetailEvent, MatchDetailState> {
   MatchDetailBloc({required this.repository})
     : super(const MatchDetailState()) {
     on<LoadMatchDetail>(_onLoadDetail);
+    on<RefreshMatchDetail>(_onRefreshDetail);
     on<SubscribeToLiveScore>(_onSubscribeLive);
     on<LiveScoreUpdated>(_onLiveUpdate);
   }
@@ -77,17 +86,109 @@ class MatchDetailBloc extends Bloc<MatchDetailEvent, MatchDetailState> {
     LoadMatchDetail event,
     Emitter<MatchDetailState> emit,
   ) async {
-    emit(state.copyWith(status: MatchDetailStatus.loading));
-    try {
-      final detail = await repository.getMatchDetail(event.matchId);
+    if (event.previewMatch != null) {
       emit(
-        state.copyWith(status: MatchDetailStatus.loaded, matchDetail: detail),
+        state.copyWith(
+          status: MatchDetailStatus.loading,
+          matchDetail: MatchDetail(match: event.previewMatch!),
+        ),
+      );
+    } else {
+      emit(state.copyWith(status: MatchDetailStatus.loading));
+    }
+
+    try {
+      final fetchedDetail = await repository.getMatchDetail(event.matchId);
+
+      // Merge with existing param (which might be the preview) to preserve flags
+      final mergedDetail = _mergeWithPreview(state.matchDetail, fetchedDetail);
+
+      emit(
+        state.copyWith(
+          status: MatchDetailStatus.loaded,
+          matchDetail: mergedDetail,
+        ),
       );
     } catch (e) {
-      emit(
-        state.copyWith(status: MatchDetailStatus.error, error: e.toString()),
-      );
+      if (state.matchDetail == null) {
+        emit(
+          state.copyWith(status: MatchDetailStatus.error, error: e.toString()),
+        );
+      }
+      // If we have preview data, we can silently fail or show a snackbar (not handled here),
+      // but we shouldn't replace valid preview data with an error screen ideally.
     }
+  }
+
+  Future<void> _onRefreshDetail(
+    RefreshMatchDetail event,
+    Emitter<MatchDetailState> emit,
+  ) async {
+    try {
+      final newDetail = await repository.getMatchDetail(event.matchId);
+      final currentDetail = state.matchDetail;
+
+      if (currentDetail != null) {
+        if (!_isDetailProgress(currentDetail, newDetail)) {
+          // print('🛡️ MatchDetail regression detected, skipping update');
+          return;
+        }
+      }
+
+      // Merge to ensure we don't lose flags on refresh either
+      final mergedDetail = _mergeWithPreview(currentDetail, newDetail);
+
+      emit(
+        state.copyWith(
+          status: MatchDetailStatus.loaded,
+          matchDetail: mergedDetail,
+        ),
+      );
+    } catch (e) {
+      // print('❌ Silent refresh failed: $e');
+    }
+  }
+
+  /// Merges [incoming] detail with [existing] to preserve data like flags
+  /// that might be missing in the [incoming] (e.g. from a partial API response).
+  MatchDetail _mergeWithPreview(MatchDetail? existing, MatchDetail incoming) {
+    if (existing == null) return incoming;
+
+    var t1 = incoming.match.team1;
+    var t2 = incoming.match.team2;
+
+    // Build a lookup of shortName → flagUrl from the existing (preview) teams.
+    // This ensures we match by team identity, NOT by position, so flags are
+    // never swapped when the API returns teams in a different order.
+    final existingFlags = <String, String>{};
+    final e1 = existing.match.team1;
+    final e2 = existing.match.team2;
+    if (e1.flagUrl.isNotEmpty) {
+      existingFlags[e1.shortName.toUpperCase()] = e1.flagUrl;
+      if (e1.id.isNotEmpty) existingFlags[e1.id] = e1.flagUrl;
+    }
+    if (e2.flagUrl.isNotEmpty) {
+      existingFlags[e2.shortName.toUpperCase()] = e2.flagUrl;
+      if (e2.id.isNotEmpty) existingFlags[e2.id] = e2.flagUrl;
+    }
+
+    // Apply the correct flag to each incoming team by matching short name or id
+    String? resolveFlag(Team t) {
+      return existingFlags[t.shortName.toUpperCase()] ??
+          existingFlags[t.id] ??
+          (t.flagUrl.isNotEmpty ? t.flagUrl : null);
+    }
+
+    final f1 = resolveFlag(t1);
+    if (f1 != null) t1 = t1.copyWith(flagUrl: f1);
+
+    final f2 = resolveFlag(t2);
+    if (f2 != null) t2 = t2.copyWith(flagUrl: f2);
+
+    // Return new detail with correctly-flagged teams
+    return incoming.copyWith(
+      match: incoming.match.copyWith(team1: t1, team2: t2),
+    );
   }
 
   void _onSubscribeLive(
@@ -102,17 +203,60 @@ class MatchDetailBloc extends Bloc<MatchDetailEvent, MatchDetailState> {
 
   void _onLiveUpdate(LiveScoreUpdated event, Emitter<MatchDetailState> emit) {
     if (state.matchDetail != null) {
+      final currentDetail = state.matchDetail!;
+
+      // Check if this live match update is a regression
+      if (!_isMatchProgress(currentDetail.match, event.match)) {
+        print('🛡️ Live score regression detected, skipping update');
+        return;
+      }
+
       emit(
         state.copyWith(
           matchDetail: MatchDetail(
             match: event.match,
-            innings: state.matchDetail!.innings,
-            commentary: state.matchDetail!.commentary,
-            stats: state.matchDetail!.stats,
+            innings: currentDetail.innings,
+            commentary: currentDetail.commentary,
+            playingXI: currentDetail.playingXI,
+            playingXI1: currentDetail.playingXI1,
+            playingXI2: currentDetail.playingXI2,
+            stats: currentDetail.stats,
           ),
         ),
       );
     }
+  }
+
+  bool _isDetailProgress(MatchDetail oldD, MatchDetail newD) {
+    return _isMatchProgress(oldD.match, newD.match);
+  }
+
+  bool _isMatchProgress(CricketMatch oldM, CricketMatch newM) {
+    final oldS1 = _parseRuns(oldM.team1.score);
+    final newS1 = _parseRuns(newM.team1.score);
+    final oldS2 = _parseRuns(oldM.team2.score);
+    final newS2 = _parseRuns(newM.team2.score);
+
+    // If either team has fewer runs than before, it's a regression
+    if (newS1 < oldS1 || newS2 < oldS2) return false;
+
+    // If runs are same, check overs if possible
+    final oldO1 = double.tryParse(oldM.team1.overs ?? '0') ?? 0.0;
+    final newO1 = double.tryParse(newM.team1.overs ?? '0') ?? 0.0;
+    final oldO2 = double.tryParse(oldM.team2.overs ?? '0') ?? 0.0;
+    final newO2 = double.tryParse(newM.team2.overs ?? '0') ?? 0.0;
+
+    if (newS1 == oldS1 && newS2 == oldS2) {
+      if (newO1 < oldO1 || newO2 < oldO2) return false;
+    }
+
+    return true;
+  }
+
+  int _parseRuns(String? score) {
+    if (score == null || score.isEmpty) return 0;
+    final match = RegExp(r'(\d+)').firstMatch(score);
+    return match != null ? int.tryParse(match.group(1)!) ?? 0 : 0;
   }
 
   @override

@@ -74,5 +74,16 @@
   "advancedStats": "Advanced Stats",
   "exclusiveInsights": "Exclusive Insights",
   "fantasyTools": "Fantasy Tools",
-  "predictions": "Predictions"
+  "predictions": "Predictions",
+  "spinAndWin": "Spin & Win",
+  "spinAndWinSubtitle": "Try your luck for daily rewards",
+  "sendSuggestion": "Send a Suggestion",
+  "helpUsImprove": "Help us improve CricketBuzz",
+  "setupGuestNickname": "Setup Guest Nickname",
+  "updatingScores": "Updating scores...",
+  "tapBackToExit": "Tap back again to exit",
+  "adFreeExperience": "Ad-Free Experience",
+  "getLifetimeAccess": "Get Lifetime Access",
+  "maybeLater": "Maybe later",
+  "yetToBat": "Yet to bat"
 }

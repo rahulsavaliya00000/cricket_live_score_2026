@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "140223746923-8skr6v8m1srp78oq4udg9d7c8jsl4sin.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cricketbuzz",
+            "certificate_hash": "76b851348c912516ae0cea42bc4e51e47f46d01c"
+          }
+        },
+        {
           "client_id": "140223746923-nplf6gemlr38vm9fq6eqsvg9rindfj7c.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -46,6 +54,42 @@
         "mobilesdk_app_id": "1:140223746923:android:d8d27fbbd5972cd865b22e",
         "android_client_info": {
           "package_name": "com.qdevix.audify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "140223746923-nplf6gemlr38vm9fq6eqsvg9rindfj7c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATPbh9RQf_peg77rlUoOmCtO-3fzSy4hQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140223746923-nplf6gemlr38vm9fq6eqsvg9rindfj7c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "140223746923-5iffle1ig0jjltj5ijc98acla312pfvb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.qdevix.audify"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140223746923:android:84f61239d48fd51e65b22e",
+        "android_client_info": {
+          "package_name": "com.qdevix.cricketbuzz"
         }
       },
       "oauth_client": [

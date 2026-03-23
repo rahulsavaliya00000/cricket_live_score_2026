@@ -4,6 +4,32 @@ enum MatchStatus { live, upcoming, completed }
 
 enum MatchFormat { test, odi, t20i, t20, ipl, other }
 
+enum MatchCategory { all, international, domestic }
+
+extension MatchCategoryX on MatchCategory {
+  String get label {
+    switch (this) {
+      case MatchCategory.all:
+        return 'All';
+      case MatchCategory.international:
+        return 'International';
+      case MatchCategory.domestic:
+        return 'Domestic';
+    }
+  }
+
+  bool matches(CricketMatch match) {
+    if (this == MatchCategory.all) return true;
+    final isInternational =
+        match.format == MatchFormat.test ||
+        match.format == MatchFormat.odi ||
+        match.format == MatchFormat.t20i;
+    return this == MatchCategory.international
+        ? isInternational
+        : !isInternational;
+  }
+}
+
 class CricketMatch extends Equatable {
   final String id;
   final String title;
@@ -33,8 +59,38 @@ class CricketMatch extends Equatable {
     this.isFeatured = false,
   });
 
+  CricketMatch copyWith({
+    String? id,
+    String? title,
+    String? seriesName,
+    String? venue,
+    MatchStatus? status,
+    MatchFormat? format,
+    DateTime? startTime,
+    Team? team1,
+    Team? team2,
+    String? result,
+    String? statusText,
+    bool? isFeatured,
+  }) {
+    return CricketMatch(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      seriesName: seriesName ?? this.seriesName,
+      venue: venue ?? this.venue,
+      status: status ?? this.status,
+      format: format ?? this.format,
+      startTime: startTime ?? this.startTime,
+      team1: team1 ?? this.team1,
+      team2: team2 ?? this.team2,
+      result: result ?? this.result,
+      statusText: statusText ?? this.statusText,
+      isFeatured: isFeatured ?? this.isFeatured,
+    );
+  }
+
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, team1.score, team2.score, statusText, result];
 }
 
 class Team extends Equatable {
@@ -54,8 +110,26 @@ class Team extends Equatable {
     this.overs,
   });
 
+  Team copyWith({
+    String? id,
+    String? name,
+    String? shortName,
+    String? flagUrl,
+    String? score,
+    String? overs,
+  }) {
+    return Team(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      shortName: shortName ?? this.shortName,
+      flagUrl: flagUrl ?? this.flagUrl,
+      score: score ?? this.score,
+      overs: overs ?? this.overs,
+    );
+  }
+
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, score, overs];
 }
 
 class Innings extends Equatable {
@@ -182,17 +256,48 @@ class MatchDetail extends Equatable {
   final CricketMatch match;
   final List<Innings> innings;
   final List<BallCommentary> commentary;
+  final List<String> playingXI; // Legacy/Combined
+  final List<String> playingXI1;
+  final List<String> playingXI2;
   final MatchStats? stats;
 
   const MatchDetail({
     required this.match,
     this.innings = const [],
     this.commentary = const [],
+    this.playingXI = const [],
+    this.playingXI1 = const [],
+    this.playingXI2 = const [],
     this.stats,
   });
 
+  MatchDetail copyWith({
+    CricketMatch? match,
+    List<Innings>? innings,
+    List<BallCommentary>? commentary,
+    List<String>? playingXI,
+    List<String>? playingXI1,
+    List<String>? playingXI2,
+    MatchStats? stats,
+  }) {
+    return MatchDetail(
+      match: match ?? this.match,
+      innings: innings ?? this.innings,
+      commentary: commentary ?? this.commentary,
+      playingXI: playingXI ?? this.playingXI,
+      playingXI1: playingXI1 ?? this.playingXI1,
+      playingXI2: playingXI2 ?? this.playingXI2,
+      stats: stats ?? this.stats,
+    );
+  }
+
   @override
-  List<Object?> get props => [match.id];
+  List<Object?> get props => [
+    match.id,
+    match,
+    commentary.length,
+    innings.length,
+  ];
 }
 
 class MatchStats extends Equatable {

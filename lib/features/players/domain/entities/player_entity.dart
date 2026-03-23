@@ -3,34 +3,50 @@ import 'package:equatable/equatable.dart';
 class Player extends Equatable {
   final String id;
   final String name;
+  final String? slug;
   final String country;
   final String imageUrl;
   final String role; // Batsman, Bowler, All-rounder, Wicket-keeper
   final String battingStyle;
   final String bowlingStyle;
+  final String bio;
+  final String born;
+  final String height;
   final DateTime? dateOfBirth;
-  final PlayerStats? battingStats;
-  final PlayerStats? bowlingStats;
+  final Map<String, PlayerStats> battingStats;
+  final Map<String, PlayerStats> bowlingStats;
   final List<RecentPerformance> recentPerformances;
   final List<String> teams;
 
   const Player({
     required this.id,
     required this.name,
+    this.slug,
     required this.country,
     this.imageUrl = '',
     required this.role,
     this.battingStyle = '',
     this.bowlingStyle = '',
+    this.bio = '',
+    this.born = '',
+    this.height = '',
     this.dateOfBirth,
-    this.battingStats,
-    this.bowlingStats,
+    this.battingStats = const {},
+    this.bowlingStats = const {},
     this.recentPerformances = const [],
     this.teams = const [],
   });
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [
+    id,
+    name,
+    slug,
+    country,
+    role,
+    battingStats,
+    bowlingStats,
+  ];
 }
 
 class PlayerStats extends Equatable {
