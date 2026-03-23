@@ -44,7 +44,7 @@ class RemoteConfigService {
   "api_crex_url": "",
   "ipl_schedule_series_id": "9241",
   "under_maintenance": false,
-  "min_app_version": "1.0.0+15",
+  "min_app_version": "1.0.0+1",
   "force_update": false
 }
 ''';
