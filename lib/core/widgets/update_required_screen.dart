@@ -8,7 +8,7 @@ class UpdateRequiredScreen extends StatelessWidget {
   const UpdateRequiredScreen({super.key});
 
   Future<void> _launchStore() async {
-    const url = 'https://play.google.com/store/apps/details?id=com.qdevix.cricketbuzz';
+    const url = 'https://play.google.com/store/apps/details?id=com.qdevix.cricket_live_score_2026';
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);

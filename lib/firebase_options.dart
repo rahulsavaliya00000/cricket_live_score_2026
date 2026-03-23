@@ -62,7 +62,7 @@ class DefaultFirebaseOptions {
     storageBucket: 'hack-the-tank.firebasestorage.app',
     androidClientId: '140223746923-15om8fotr173csrghjk7rai3dajesi2s.apps.googleusercontent.com',
     iosClientId: '140223746923-ik5th9ami9tulnqofu5t8l8d4e4fif0a.apps.googleusercontent.com',
-    iosBundleId: 'com.qdevix.cricketbuzz',
+    iosBundleId: 'com.qdevix.cricket_live_score_2026',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     storageBucket: 'hack-the-tank.firebasestorage.app',
     androidClientId: '140223746923-15om8fotr173csrghjk7rai3dajesi2s.apps.googleusercontent.com',
     iosClientId: '140223746923-ik5th9ami9tulnqofu5t8l8d4e4fif0a.apps.googleusercontent.com',
-    iosBundleId: 'com.qdevix.cricketbuzz',
+    iosBundleId: 'com.qdevix.cricket_live_score_2026',
   );
 
 }

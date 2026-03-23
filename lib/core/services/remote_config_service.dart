@@ -109,8 +109,7 @@ class RemoteConfigService {
 
   void _parseFlags() {
     try {
-      final defaults =
-          json.decode(_defaultJson) as Map<String, dynamic>;
+      final defaults = json.decode(_defaultJson) as Map<String, dynamic>;
       final raw = _rc.getString(kAppConfig);
       final fetched =
           json.decode(raw.isEmpty ? _defaultJson : raw) as Map<String, dynamic>;
@@ -128,7 +127,8 @@ class RemoteConfigService {
     try {
       final raw = _rc.getString(kAdConfig);
       _ads =
-          json.decode(raw.isEmpty ? _defaultAdJson : raw) as Map<String, dynamic>;
+          json.decode(raw.isEmpty ? _defaultAdJson : raw)
+              as Map<String, dynamic>;
     } catch (e) {
       debugPrint('⚠️ RemoteConfig Ads parse failed (using defaults): $e');
       _ads = json.decode(_defaultAdJson) as Map<String, dynamic>;
@@ -160,7 +160,8 @@ class RemoteConfigService {
   String get iplScheduleSeriesId => _str('ipl_schedule_series_id');
 
   // ── Ad Unit ID getters ────────────────────────────────────────────────────
-  String get adInterstitialId => (_ads['interstitial_id'] as String? ?? '').trim();
+  String get adInterstitialId =>
+      (_ads['interstitial_id'] as String? ?? '').trim();
   String get adRewardedId => (_ads['rewarded_id'] as String? ?? '').trim();
   String get adBannerId => (_ads['banner_id'] as String? ?? '').trim();
   String get adAppOpenId => (_ads['app_open_id'] as String? ?? '').trim();
