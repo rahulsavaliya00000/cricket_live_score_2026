@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 /// Wraps Firebase Remote Config.
 /// All flags live inside a single JSON parameter called [kAppConfig].
 ///
-/// Firebase Remote Config key:  app_config
+/// Firebase Remote Config key:  app_config_two
 /// Default value (paste this in Firebase Console as the default):
 /// {
 ///   "skip_onboarding": false,     -- true = skip onboarding on first launch
@@ -23,8 +23,8 @@ class RemoteConfigService {
   late final FirebaseRemoteConfig _rc;
 
   // ── Single key in Firebase Remote Config ──────────────────────────────────
-  static const kAppConfig = 'app_config';
-  static const kAdConfig = 'ad_config';
+  static const kAppConfig = 'app_config_two';
+  static const kAdConfig = 'ad_config_two';
 
   // ── In-app default JSON (used when Remote Config is unreachable) ──────────
   // ⚠️  URLs are intentionally empty — they MUST be set in Firebase Console.
