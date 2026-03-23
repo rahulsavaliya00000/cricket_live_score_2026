@@ -98,9 +98,14 @@ void main() {
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarDividerColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
+          systemNavigationBarIconBrightness: Brightness.light,
         ),
       );
+      // Ensures the Flutter UI fills the entire screen including system bars
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
       // Notifications
       final notificationService = NotificationService();

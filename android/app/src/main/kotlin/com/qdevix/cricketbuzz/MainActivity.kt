@@ -9,6 +9,7 @@ import android.util.Log
 import fl.pip.FlPiPActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import androidx.core.view.WindowCompat
 
 class MainActivity : FlPiPActivity() {
 
@@ -40,6 +41,7 @@ class MainActivity : FlPiPActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         // Save route from Intent (cold/killed start) to SharedPreferences.
         // Flutter reads it via shared_preferences package in navigateFromLaunch().
