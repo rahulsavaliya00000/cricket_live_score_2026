@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_pip/fl_pip.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cricket_live_score/features/home/presentation/bloc/home_bloc.dart';
 import 'package:cricket_live_score/features/matches/domain/entities/match_entity.dart';
 import 'package:cricket_live_score/features/profile/presentation/bloc/premium_bloc.dart';
@@ -125,28 +126,28 @@ class _ScaffoldWithNavState extends State<ScaffoldWithNav> {
                       onTap: (index) => context.go(_tabs[index]),
                       items: [
                         _navItem(
-                          Icons.home_rounded,
-                          Icons.home_outlined,
+                          FontAwesomeIcons.house,
+                          FontAwesomeIcons.house,
                           AppLocalizations.of(context)!.home,
                         ),
                         _navItem(
-                          Icons.sports_cricket_rounded,
-                          Icons.sports_cricket_outlined,
+                          FontAwesomeIcons.solidStar,
+                          FontAwesomeIcons.star,
                           AppLocalizations.of(context)!.matches,
                         ),
                         _navItem(
-                          Icons.emoji_events_rounded,
-                          Icons.emoji_events_outlined,
+                          FontAwesomeIcons.trophy,
+                          FontAwesomeIcons.trophy,
                           AppLocalizations.of(context)!.series,
                         ),
                         _navItem(
-                          Icons.people_rounded,
-                          Icons.people_outlined,
+                          FontAwesomeIcons.solidUser,
+                          FontAwesomeIcons.user,
                           AppLocalizations.of(context)!.players,
                         ),
                         _navItem(
-                          Icons.person_rounded,
-                          Icons.person_outlined,
+                          FontAwesomeIcons.solidCircleUser,
+                          FontAwesomeIcons.circleUser,
                           AppLocalizations.of(context)!.profile,
                         ),
                       ],
@@ -167,8 +168,8 @@ class _ScaffoldWithNavState extends State<ScaffoldWithNav> {
     String label,
   ) {
     return BottomNavigationBarItem(
-      activeIcon: Icon(active),
-      icon: Icon(inactive),
+      activeIcon: FaIcon(active),
+      icon: FaIcon(inactive),
       label: label,
     );
   }

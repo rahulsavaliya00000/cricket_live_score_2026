@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cricket_live_score/core/constants/app_colors.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ErrorView extends StatelessWidget {
   final String message;
@@ -44,7 +45,7 @@ class ErrorView extends StatelessWidget {
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh_rounded, size: 18),
+                icon: const FaIcon(FontAwesomeIcons.rotate, size: 18),
                 label: const Text('Try Again'),
               ),
             ],

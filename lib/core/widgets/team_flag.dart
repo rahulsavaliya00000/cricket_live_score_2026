@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TeamFlag extends StatelessWidget {
   final String flagUrl;
@@ -63,7 +64,7 @@ class TeamFlag extends StatelessWidget {
         color: Colors.grey.withOpacity(0.2),
         shape: BoxShape.circle,
       ),
-      child: Icon(Icons.sports_cricket, size: size * 0.6, color: Colors.grey),
+      child: FaIcon(FontAwesomeIcons.baseball, size: size * 0.6, color: Colors.grey),
     );
   }
 }

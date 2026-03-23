@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class EmptyStateView extends StatelessWidget {
   final String title;
@@ -57,7 +58,7 @@ class EmptyStateView extends StatelessWidget {
               const SizedBox(height: 24),
               OutlinedButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.refresh_rounded, size: 18),
+                icon: const FaIcon(FontAwesomeIcons.rotate, size: 18),
                 label: Text(actionLabel!),
               ),
             ],

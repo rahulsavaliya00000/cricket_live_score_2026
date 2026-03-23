@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cricket_live_score/core/utils/ad_helper.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:math' as math;
 
 class SpinningFAB extends StatefulWidget {
@@ -82,12 +83,12 @@ class _SpinningFABState extends State<SpinningFAB>
                   ),
                 ),
               ),
-              const Icon(Icons.sports_cricket, color: Colors.white, size: 32),
+              const FaIcon(FontAwesomeIcons.baseball, color: Colors.white, size: 32),
               const Positioned(
                 top: 8,
                 right: 8,
-                child: Icon(
-                  Icons.auto_awesome,
+                child: FaIcon(
+                  FontAwesomeIcons.solidStar,
                   color: Colors.amberAccent,
                   size: 12,
                 ),
