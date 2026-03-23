@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:140223746923:android:e52ecbab9a315ea765b22e",
         "android_client_info": {
-          "package_name": "com.example.cricketbuzz"
+          "package_name": "com.qdevix.cricket_live_score_2026"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "140223746923-8skr6v8m1srp78oq4udg9d7c8jsl4sin.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.cricketbuzz",
+            "package_name": "com.qdevix.cricket_live_score_2026",
             "certificate_hash": "76b851348c912516ae0cea42bc4e51e47f46d01c"
           }
         },

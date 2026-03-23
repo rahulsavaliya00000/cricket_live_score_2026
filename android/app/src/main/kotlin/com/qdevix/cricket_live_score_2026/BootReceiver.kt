@@ -1,4 +1,4 @@
-package com.qdevix.cricketbuzz
+package com.qdevix.cricket_live_score_2026
 
 import android.content.BroadcastReceiver
 import android.content.Context
