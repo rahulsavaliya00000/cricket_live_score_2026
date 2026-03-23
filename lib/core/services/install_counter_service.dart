@@ -22,7 +22,7 @@ class InstallCounterService {
       
       // Using set with merge: true to ensure the document exists
       await _firestore.collection('install').doc('total').set({
-        'current_install': FieldValue.increment(1),
+        'current_install_two': FieldValue.increment(1),
       }, SetOptions(merge: true));
 
       await _prefs.setBool(_hasIncrementedKey, true);
