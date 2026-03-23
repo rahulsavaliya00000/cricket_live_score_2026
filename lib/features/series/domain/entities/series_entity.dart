@@ -31,4 +31,4 @@ class Series extends Equatable {
   List<Object?> get props => [id, startDateTime, endDateTime];
 }
 
-enum SeriesType { international, ipl, t20League, domestic, bilateral }
+enum SeriesType { international, ipl, t20League, domestic, bilateral, women }

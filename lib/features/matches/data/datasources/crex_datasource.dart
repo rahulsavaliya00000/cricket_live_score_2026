@@ -5,10 +5,13 @@ import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
 import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart';
 import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
+import 'package:cricketbuzz/core/services/remote_config_service.dart';
 
 class CrexDataSource implements CricketDataSource {
   final http.Client client;
-  final String _baseUrl = 'https://crex.com';
+
+  /// URL comes from Firebase Remote Config — never hardcoded in the binary.
+  String get _baseUrl => RemoteConfigService.instance.apiCrexUrl;
 
   Map<String, String> get _headers => {
     'User-Agent':
@@ -345,6 +348,11 @@ class CrexDataSource implements CricketDataSource {
   @override
   Future<List<CricketTeam>> getTeams() async {
     return CricketTeam.internationalTeams;
+  }
+
+  @override
+  Future<List<CricketTeam>> getSeriesSquads(String seriesId) async {
+    return [];
   }
 
   @override

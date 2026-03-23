@@ -6,11 +6,14 @@ import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
 import 'package:cricketbuzz/features/players/domain/entities/player_entity.dart';
 import 'package:cricketbuzz/features/players/domain/entities/team_entity.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
+import 'package:cricketbuzz/core/services/remote_config_service.dart';
 
 class ApiCricketDataSource implements CricketDataSource {
   final http.Client client;
-  final String _baseUrl = 'https://www.cricbuzz.com';
-  final String _mBaseUrl = 'https://m.cricbuzz.com';
+
+  /// URLs come from Firebase Remote Config — never hardcoded in the binary.
+  String get _baseUrl => RemoteConfigService.instance.apiBaseUrl;
+  String get _mBaseUrl => RemoteConfigService.instance.apiMBaseUrl;
 
   Map<String, String> get _headers => {
     'User-Agent':
@@ -230,6 +233,8 @@ class ApiCricketDataSource implements CricketDataSource {
       // Fetch team flag URLs from the squads page (JSON API doesn't include them)
       String t1FlagUrl = '';
       String t2FlagUrl = '';
+      final t1ShortRaw = (team1['shortName'] ?? '').toString().toUpperCase();
+      final t2ShortRaw = (team2['shortName'] ?? '').toString().toUpperCase();
       try {
         final squadsResponse = await client.get(
           Uri.parse('$_mBaseUrl/cricket-match-squads/$matchId'),
@@ -243,18 +248,41 @@ class ApiCricketDataSource implements CricketDataSource {
                 !src.contains('gthumb') &&
                 src.contains('/i1/c');
           }).toList();
-          if (flagImgs.isNotEmpty) {
-            t1FlagUrl = flagImgs[0].attributes['src'] ?? '';
-          }
-          if (flagImgs.length >= 2) {
-            // Get second unique flag URL (skip duplicates of team1)
-            for (int i = 1; i < flagImgs.length; i++) {
-              final src = flagImgs[i].attributes['src'] ?? '';
-              if (src != t1FlagUrl) {
-                t2FlagUrl = src;
-                break;
-              }
+
+          // Collect unique flag URLs in DOM order
+          final uniqueFlags = <String>[];
+          for (final img in flagImgs) {
+            final src = img.attributes['src'] ?? '';
+            if (src.isNotEmpty && !uniqueFlags.contains(src)) {
+              uniqueFlags.add(src);
             }
+          }
+
+          // Try to match flags to teams by alt/title text first (most reliable)
+          for (final img in flagImgs) {
+            final src = img.attributes['src'] ?? '';
+            if (src.isEmpty) continue;
+            final alt = (img.attributes['alt'] ?? img.attributes['title'] ?? '')
+                .toUpperCase();
+            if (t1FlagUrl.isEmpty &&
+                alt.isNotEmpty &&
+                t1ShortRaw.isNotEmpty &&
+                alt.contains(t1ShortRaw)) {
+              t1FlagUrl = src;
+            } else if (t2FlagUrl.isEmpty &&
+                alt.isNotEmpty &&
+                t2ShortRaw.isNotEmpty &&
+                alt.contains(t2ShortRaw)) {
+              t2FlagUrl = src;
+            }
+          }
+
+          // Fallback: assign by position (first unique = team1, second = team2)
+          if (t1FlagUrl.isEmpty && uniqueFlags.isNotEmpty) {
+            t1FlagUrl = uniqueFlags[0];
+          }
+          if (t2FlagUrl.isEmpty && uniqueFlags.length >= 2) {
+            t2FlagUrl = uniqueFlags[1];
           }
         }
       } catch (_) {
@@ -518,42 +546,51 @@ class ApiCricketDataSource implements CricketDataSource {
       final bowlingStats = <String, PlayerStats>{};
 
       final tables = document.querySelectorAll('table');
-      // Usually Table 2 is Batting, Table 3 is Bowling (0 and 1 are rankings)
-      // But verify by headers
-      for (final table in tables) {
+
+      for (int tableIdx = 0; tableIdx < tables.length; tableIdx++) {
+        final table = tables[tableIdx];
         final headers = table
             .querySelectorAll('th')
             .map((e) => e.text.trim())
             .toList();
         final rows = table.querySelectorAll('tr');
 
-        if (headers.isEmpty && rows.isNotEmpty) {
-          // Transposed table logic?
-          // Actually header might be the first row locally
+        // Skip ranking tables (Format / Current Rank / Best Rank)
+        if (headers.any((h) => h.contains('Rank') || h.contains('Format'))) {
+          continue;
         }
 
-        // Check if this is batting or bowling based on row labels
-        bool isBatting = false;
-        bool isBowling = false;
+        // Must have format headers like [empty, Test, ODI, T20, IPL]
+        if (headers.length < 2) continue;
+        final formats = headers.sublist(1);
+        if (formats.isEmpty) continue;
 
+        // Determine batting vs bowling by looking at the preceding
+        // sibling text (e.g. "Batting Career Summary" / "Bowling Career Summary")
+        // or by checking for unique bowling-only labels (Wickets, Eco, BBI, BBM, Maidens)
         final rowLabels = rows
             .map((r) => r.querySelector('td')?.text.trim() ?? '')
             .toSet();
-        if (rowLabels.contains('Runs') && rowLabels.contains('Innings')) {
-          isBatting = true;
-        }
-        if (rowLabels.contains('Wickets') || rowLabels.contains('Wkts')) {
-          isBowling = true;
-        }
+
+        // Use unique labels to distinguish:
+        // Bowling tables have: Wickets, Eco, BBI, BBM, Maidens
+        // Batting tables have: Highest, Fours, Sixes, 50s, 100s, Ducks
+        final bool isBowling =
+            rowLabels.contains('Wickets') ||
+            rowLabels.contains('Wkts') ||
+            rowLabels.contains('Eco') ||
+            rowLabels.contains('BBI') ||
+            rowLabels.contains('BBM') ||
+            rowLabels.contains('Maidens');
+        final bool isBatting =
+            rowLabels.contains('Highest') ||
+            rowLabels.contains('Fours') ||
+            rowLabels.contains('Sixes') ||
+            rowLabels.contains('50s') ||
+            rowLabels.contains('100s') ||
+            rowLabels.contains('Ducks');
 
         if (!isBatting && !isBowling) continue;
-
-        // Parse Transposed Table
-        // Headers (Formats): first row usually has th or td?
-        // My script showed keys are in first column, formats in header row
-        // Table 2 headers: [, Test, ODI, T20, IPL]
-
-        final formats = headers.sublist(1); // Skip first empty header
 
         // Initialize stats map for these formats
         final Map<String, Map<String, dynamic>> tempStats = {};
@@ -568,13 +605,13 @@ class ApiCricketDataSource implements CricketDataSource {
           final label = cells[0].text.trim();
           final values = cells.sublist(1).map((e) => e.text.trim()).toList();
 
-          for (int i = 0; i < formats.length; i++) {
+          for (int i = 0; i < formats.length && i < values.length; i++) {
             final fmt = formats[i];
             final val = values[i];
 
             if (val == '-' || val.isEmpty) continue;
 
-            if (isBatting) {
+            if (isBatting && !isBowling) {
               _parseBattingStat(tempStats[fmt]!, label, val);
             } else {
               _parseBowlingStat(tempStats[fmt]!, label, val);
@@ -637,15 +674,15 @@ class ApiCricketDataSource implements CricketDataSource {
       );
     } catch (e) {
       print('❌ Error fetching player detail: $e');
-      throw e;
+      rethrow;
     }
   }
 
   void _parseBattingStat(Map<String, dynamic> map, String label, String val) {
     // Labels: Matches, Innings, Runs, Average, SR, 100s, 50s, 4s, 6s
-    if (label.contains('Matches'))
+    if (label.contains('Matches')) {
       map['matches'] = val;
-    else if (label.contains('Innings'))
+    } else if (label.contains('Innings'))
       map['innings'] = val;
     else if (label.contains('Runs'))
       map['runs'] = val;
@@ -668,18 +705,18 @@ class ApiCricketDataSource implements CricketDataSource {
   }
 
   void _parseBowlingStat(Map<String, dynamic> map, String label, String val) {
-    // Labels: Matches, Innings, Balls, Runs, Wickets, BBM, Econ, Avg, SR, 5w, 10w
-    if (label.contains('Matches'))
+    // Labels: Matches, Innings, Balls, Runs, Wickets, BBM, Econ/Eco, Avg, SR, BBI, 5w, 10w
+    if (label.contains('Matches')) {
       map['matches'] = val;
-    else if (label.contains('Innings'))
+    } else if (label.contains('Innings'))
       map['innings'] = val;
     else if (label.contains('Wickets') || label == 'Wkts')
       map['wickets'] = val;
-    else if (label.contains('Econ'))
+    else if (label.contains('Econ') || label == 'Eco')
       map['economy'] = val;
-    else if (label.contains('Avg'))
+    else if (label == 'Avg' || label == 'Average')
       map['bowlingAverage'] = val;
-    else if (label.contains('BBM') || label.contains('Best'))
+    else if (label == 'BBI' || label == 'BBM' || label.contains('Best'))
       map['bestBowling'] = val;
     else if (label.contains('5w') || label == '5W')
       map['fiveWickets'] = val;
@@ -688,19 +725,45 @@ class ApiCricketDataSource implements CricketDataSource {
   @override
   Future<List<Player>> getTeamPlayers(String teamSlug, String teamId) async {
     try {
-      final response = await client.get(
-        Uri.parse('$_mBaseUrl/cricket-team/$teamSlug/$teamId/players'),
-        headers: _headers,
-      );
+      // Try primary URL first
+      final primaryUrl = '$_mBaseUrl/cricket-team/$teamSlug/$teamId/players';
+      // Fallback URL used for associate/ICC member teams (different slug format)
+      final fallbackUrl =
+          '$_mBaseUrl/cricket-team/$teamSlug-cricket/$teamId/players';
+
+      List<Player> players = await _scrapePlayersFromUrl(primaryUrl, teamSlug);
+
+      // If no players found, try the fallback URL (e.g. namibia-cricket, canada-cricket)
+      if (players.isEmpty) {
+        players = await _scrapePlayersFromUrl(fallbackUrl, teamSlug);
+      }
+
+      // If still empty, try without the teamId path component (some older team pages)
+      if (players.isEmpty) {
+        final altUrl = '$_mBaseUrl/cricket-team/$teamSlug/players';
+        players = await _scrapePlayersFromUrl(altUrl, teamSlug);
+      }
+
+      return players;
+    } catch (e) {
+      print('❌ Error fetching team players: $e');
+      return [];
+    }
+  }
+
+  Future<List<Player>> _scrapePlayersFromUrl(
+    String url,
+    String teamSlug,
+  ) async {
+    try {
+      final response = await client.get(Uri.parse(url), headers: _headers);
       if (response.statusCode != 200) return [];
 
       final document = parse(response.body);
       final List<Player> players = [];
       String currentRole = 'Player';
 
-      // Also find role category headings
-      // The page structure has role headings (BATSMEN, ALL ROUNDER, WICKET KEEPER, BOWLER)
-      // followed by player links
+      // Role category headings
       final allElements = document.querySelectorAll(
         'a[href*="/profiles/"], a[href*="/cricket-team/"]',
       );
@@ -715,9 +778,9 @@ class ApiCricketDataSource implements CricketDataSource {
                 text == 'ALL ROUNDER' ||
                 text == 'WICKET KEEPER' ||
                 text == 'BOWLER')) {
-          if (text == 'BATSMEN')
+          if (text == 'BATSMEN') {
             currentRole = 'Batsman';
-          else if (text == 'ALL ROUNDER')
+          } else if (text == 'ALL ROUNDER')
             currentRole = 'All-Rounder';
           else if (text == 'WICKET KEEPER')
             currentRole = 'Wicket-Keeper';
@@ -741,7 +804,6 @@ class ApiCricketDataSource implements CricketDataSource {
           if (img != null) {
             imageUrl = img.attributes['src'] ?? '';
             if (imageUrl.isEmpty) {
-              // Try srcSet
               final srcSet = img.attributes['srcSet'] ?? '';
               if (srcSet.isNotEmpty) {
                 imageUrl = srcSet.split(' ').first;
@@ -749,7 +811,7 @@ class ApiCricketDataSource implements CricketDataSource {
             }
           }
 
-          // If no img found in link, try to construct from slug
+          // Construct image URL from slug as fallback
           if (imageUrl.isEmpty && playerSlug.isNotEmpty) {
             imageUrl =
                 'https://static.cricbuzz.com/a/img/v1/i1/c1/$playerSlug.jpg?d=low&p=gthumb';
@@ -760,6 +822,7 @@ class ApiCricketDataSource implements CricketDataSource {
               id: playerId,
               name: playerName,
               country: teamSlug
+                  .replaceAll('-cricket', '')
                   .replaceAll('-', ' ')
                   .split(' ')
                   .map(
@@ -776,8 +839,72 @@ class ApiCricketDataSource implements CricketDataSource {
       }
 
       return players;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<CricketTeam>> getSeriesSquads(String seriesId) async {
+    try {
+      final response = await client.get(
+        Uri.parse('$_mBaseUrl/cricket-series/$seriesId/s/squads'),
+        headers: _headers,
+      );
+      if (response.statusCode != 200) return [];
+
+      final scriptRegex = RegExp(r'self\.__next_f\.push\(\[1,"(.*?)"\]\)');
+      final matches = scriptRegex.allMatches(response.body);
+
+      for (final match in matches) {
+        String jsonStr = match.group(1) ?? '';
+        jsonStr = jsonStr.replaceAll(r'\"', '"').replaceAll(r'\\', r'\');
+
+        if (jsonStr.contains('"squads":[')) {
+          final startIdx = jsonStr.indexOf('"squads":[');
+          if (startIdx != -1) {
+            final endIdx = jsonStr.indexOf('],"appIndex"', startIdx);
+            if (endIdx != -1) {
+              final squadsData = jsonStr.substring(
+                startIdx + '"squads":'.length,
+                endIdx + 1,
+              );
+
+              final List<dynamic> squadsList = json.decode(squadsData);
+              final List<CricketTeam> teams = [];
+
+              for (final squad in squadsList) {
+                if (squad['isHeader'] == true) continue;
+                
+                final String teamName = squad['squadType'] ?? '';
+                final int teamId = squad['teamId'] ?? 0;
+                final int imageId = squad['imageId'] ?? 0;
+                
+                if (teamName.isNotEmpty && teamId > 0) {
+                  final String slug = teamName.toLowerCase().replaceAll(' ', '-');
+                  final String flagUrl = imageId > 0
+                      ? 'https://static.cricbuzz.com/a/img/v1/72x54/i1/c$imageId/$slug.jpg'
+                      : '';
+                      
+                  teams.add(
+                    CricketTeam(
+                      id: teamId.toString(),
+                      name: teamName,
+                      slug: slug,
+                      flagUrl: flagUrl,
+                    ),
+                  );
+                }
+              }
+
+              if (teams.isNotEmpty) return teams;
+            }
+          }
+        }
+      }
+      return [];
     } catch (e) {
-      print('❌ Error fetching team players: $e');
+      print('Error parsing squads data: $e');
       return [];
     }
   }
@@ -907,6 +1034,11 @@ class ApiCricketDataSource implements CricketDataSource {
   SeriesType _determineSeriesType(String name) {
     final lower = name.toLowerCase();
 
+    // 0. Women's series (check first before other categories)
+    if (lower.contains('women') || lower.contains('women\'s')) {
+      return SeriesType.women;
+    }
+
     // 1. Explicit Leagues
     if (lower.contains('ipl') || lower.contains('indian premier league')) {
       return SeriesType.ipl;
@@ -1017,26 +1149,26 @@ class ApiCricketDataSource implements CricketDataSource {
         final window = rscData.substring(windowStart, windowEnd);
 
         // Extract fields using simple regex on unescaped JSON
-        String _extract(String key, String data) {
+        String extract(String key, String data) {
           final m = RegExp('"$key":"(.*?)"').firstMatch(data);
           return m?.group(1) ?? '';
         }
 
-        int _extractInt(String key, String data) {
+        int extractInt(String key, String data) {
           final m = RegExp('"$key":(\\d+)').firstMatch(data);
           return int.tryParse(m?.group(1) ?? '') ?? 0;
         }
 
-        double _extractDouble(String key, String data) {
+        double extractDouble(String key, String data) {
           final m = RegExp('"$key":([\\d.]+)').firstMatch(data);
           return double.tryParse(m?.group(1) ?? '') ?? 0.0;
         }
 
-        final matchDesc = _extract('matchDesc', window);
-        final matchFormat = _extract('matchFormat', window);
-        final state = _extract('state', window);
-        final status = _extract('status', window);
-        final startDateStr = _extract('startDate', window);
+        final matchDesc = extract('matchDesc', window);
+        final matchFormat = extract('matchFormat', window);
+        final state = extract('state', window);
+        final status = extract('status', window);
+        final startDateStr = extract('startDate', window);
 
         // Extract team1 info
         String t1Name = 'Team 1';
@@ -1046,9 +1178,9 @@ class ApiCricketDataSource implements CricketDataSource {
         if (t1Idx != -1) {
           final t1End = (t1Idx + 300).clamp(0, window.length);
           final t1Data = window.substring(t1Idx, t1End);
-          t1Name = _extract('teamName', t1Data);
-          t1Short = _extract('teamSName', t1Data);
-          t1ImageId = _extractInt('imageId', t1Data);
+          t1Name = extract('teamName', t1Data);
+          t1Short = extract('teamSName', t1Data);
+          t1ImageId = extractInt('imageId', t1Data);
         }
 
         // Extract team2 info
@@ -1059,9 +1191,9 @@ class ApiCricketDataSource implements CricketDataSource {
         if (t2Idx != -1) {
           final t2End = (t2Idx + 300).clamp(0, window.length);
           final t2Data = window.substring(t2Idx, t2End);
-          t2Name = _extract('teamName', t2Data);
-          t2Short = _extract('teamSName', t2Data);
-          t2ImageId = _extractInt('imageId', t2Data);
+          t2Name = extract('teamName', t2Data);
+          t2Short = extract('teamSName', t2Data);
+          t2ImageId = extractInt('imageId', t2Data);
         }
 
         // Extract venue
@@ -1070,8 +1202,8 @@ class ApiCricketDataSource implements CricketDataSource {
         if (venueIdx != -1) {
           final venueEnd = (venueIdx + 200).clamp(0, window.length);
           final venueData = window.substring(venueIdx, venueEnd);
-          final ground = _extract('ground', venueData);
-          final city = _extract('city', venueData);
+          final ground = extract('ground', venueData);
+          final city = extract('city', venueData);
           if (ground.isNotEmpty) {
             venue = city.isNotEmpty ? '$ground, $city' : ground;
           }
@@ -1089,9 +1221,9 @@ class ApiCricketDataSource implements CricketDataSource {
           if (t1sIdx != -1) {
             final innEnd = (t1sIdx + 200).clamp(0, scoreData.length);
             final innData = scoreData.substring(t1sIdx, innEnd);
-            final runs = _extractInt('runs', innData);
-            final wickets = _extractInt('wickets', innData);
-            final overs = _extractDouble('overs', innData);
+            final runs = extractInt('runs', innData);
+            final wickets = extractInt('wickets', innData);
+            final overs = extractDouble('overs', innData);
             if (runs > 0 || wickets > 0) {
               t1Score = '$runs/$wickets ($overs)';
             }
@@ -1100,9 +1232,9 @@ class ApiCricketDataSource implements CricketDataSource {
           if (t2sIdx != -1) {
             final innEnd = (t2sIdx + 200).clamp(0, scoreData.length);
             final innData = scoreData.substring(t2sIdx, innEnd);
-            final runs = _extractInt('runs', innData);
-            final wickets = _extractInt('wickets', innData);
-            final overs = _extractDouble('overs', innData);
+            final runs = extractInt('runs', innData);
+            final wickets = extractInt('wickets', innData);
+            final overs = extractDouble('overs', innData);
             if (runs > 0 || wickets > 0) {
               t2Score = '$runs/$wickets ($overs)';
             }
@@ -1252,13 +1384,15 @@ class ApiCricketDataSource implements CricketDataSource {
 
               if (team1Name == null || team1Name.isEmpty) {
                 final alt1 = images[0].attributes['alt'] ?? '';
-                if (alt1.isNotEmpty && !alt1.contains('logo'))
+                if (alt1.isNotEmpty && !alt1.contains('logo')) {
                   team1Name = alt1.trim();
+                }
               }
               if (team2Name == null || team2Name.isEmpty) {
                 final alt2 = images[1].attributes['alt'] ?? '';
-                if (alt2.isNotEmpty && !alt2.contains('logo'))
+                if (alt2.isNotEmpty && !alt2.contains('logo')) {
                   team2Name = alt2.trim();
+                }
               }
 
               if (team1Flag.startsWith('/')) team1Flag = _baseUrl + team1Flag;
@@ -1267,47 +1401,59 @@ class ApiCricketDataSource implements CricketDataSource {
 
             if (spans.isNotEmpty) {
               statusText = spans.last.text.trim();
-              final teamCandidates = spans.where((s) {
-                final t = s.text.trim().toLowerCase();
-                if (t.isEmpty || t.length < 2) return false;
-                if (t.contains('•') || t.contains('/')) return false;
-                if (RegExp(r'^\d+[-–—]\d+$|^\d+/\d+$').hasMatch(t))
-                  return false;
-                if (RegExp(r'^\(\d+\.?\d*\s*(ov|overs)\)$').hasMatch(t))
-                  return false;
-                final statusKeywords = [
-                  'need',
-                  'runs',
-                  'won',
-                  'stumps',
-                  'tea',
-                  'lunch',
-                  'session',
-                  'day',
-                  'leads',
-                  'trail',
-                  'starts',
-                  'opted',
-                  'choose',
-                  'toss',
-                  'match',
-                  'vs',
-                ];
-                return !statusKeywords.any((kw) => t.contains(kw));
-              }).toList();
 
-              if (team1Name == null && teamCandidates.isNotEmpty)
-                team1Name = teamCandidates[0].text.trim();
-              if (team2Name == null && teamCandidates.length >= 2)
-                team2Name = teamCandidates[1].text.trim();
+              String? t1Abbr, t2Abbr;
 
-              final scoreCandidates = spans
-                  .where((s) => RegExp(r'\d+[-–—]\d+|\d+/\d+').hasMatch(s.text))
-                  .toList();
-              if (scoreCandidates.isNotEmpty) {
-                score1 = scoreCandidates[0].text.trim();
-                if (scoreCandidates.length > 1)
-                  score2 = scoreCandidates[1].text.trim();
+              // Rewrite extraction using the exact HTML row structure
+              // Each team gets its own standard row: <div class="flex items-center gap-4 justify-between">
+              final teamRows = card.querySelectorAll(
+                '.flex.items-center.gap-4.justify-between',
+              );
+
+              if (teamRows.length >= 2) {
+                // TEAM 1 ROW
+                final t1Row = teamRows[0];
+                final t1NameSpans =
+                    t1Row.children.isNotEmpty &&
+                        t1Row.children[0].children.isNotEmpty
+                    ? t1Row.children[0].querySelectorAll('span')
+                    : [];
+                if (t1NameSpans.length >= 2) {
+                  final abbr = t1NameSpans[1].text.trim();
+                  if (abbr.isNotEmpty && abbr.length <= 5) t1Abbr = abbr;
+                }
+                if (t1Row.children.length >= 2) {
+                  final s = t1Row.children.last.text.trim();
+                  if (s.isNotEmpty) score1 = s;
+                }
+
+                // TEAM 2 ROW
+                final t2Row = teamRows[1];
+                final t2NameSpans =
+                    t2Row.children.isNotEmpty &&
+                        t2Row.children[0].children.isNotEmpty
+                    ? t2Row.children[0].querySelectorAll('span')
+                    : [];
+                if (t2NameSpans.length >= 2) {
+                  final abbr = t2NameSpans[1].text.trim();
+                  if (abbr.isNotEmpty && abbr.length <= 5) t2Abbr = abbr;
+                }
+                if (t2Row.children.length >= 2) {
+                  final s = t2Row.children.last.text.trim();
+                  if (s.isNotEmpty) score2 = s;
+                }
+              }
+
+              // Only assign abbreviation if we utterly lack a team name from the image alt text
+              if (team1Name == null ||
+                  team1Name.isEmpty ||
+                  team1Name == 'Team 1') {
+                if (t1Abbr != null) team1Name = t1Abbr;
+              }
+              if (team2Name == null ||
+                  team2Name.isEmpty ||
+                  team2Name == 'Team 2') {
+                if (t2Abbr != null) team2Name = t2Abbr;
               }
 
               final header = spans.firstWhere(
@@ -1327,7 +1473,7 @@ class ApiCricketDataSource implements CricketDataSource {
             MatchStatus matchStatus = status;
             final lowerStatusText = statusText?.toLowerCase() ?? '';
             final lowerTitle = (title).toLowerCase();
-            final lowerAll = (lowerStatusText + ' ' + lowerTitle).trim();
+            final lowerAll = ('$lowerStatusText $lowerTitle').trim();
             bool hasMatch(String pattern) =>
                 RegExp('\\b$pattern\\b').hasMatch(lowerAll);
 
@@ -1394,6 +1540,19 @@ class ApiCricketDataSource implements CricketDataSource {
           .toList();
 
       final filtered = results.where((m) => m.status == status).toList();
+
+      // Sort deterministically to prevent UI "shuffling" on 15s refresh
+      // Since startTime is not always available without slow individual API calls,
+      // the match numerical ID is chronological and ensures perfect stable rendering.
+      filtered.sort((a, b) {
+        final idA = int.tryParse(a.id) ?? 0;
+        final idB = int.tryParse(b.id) ?? 0;
+        if (status == MatchStatus.completed) {
+          return idB.compareTo(idA); // Descending for recent
+        }
+        return idA.compareTo(idB); // Ascending for upcoming/live
+      });
+
       return filtered.isEmpty ? _getFallbackMatches(status) : filtered;
     } catch (e) {
       return _getFallbackMatches(status);
@@ -1401,56 +1560,11 @@ class ApiCricketDataSource implements CricketDataSource {
   }
 
   List<CricketMatch> _getFallbackMatches(MatchStatus status) {
-    if (status == MatchStatus.live) {
-      return [
-        CricketMatch(
-          id: 'fb_1',
-          title: 'IPL 2026 - Match 1',
-          seriesName: 'Indian Premier League',
-          venue: 'Wankhede Stadium',
-          status: MatchStatus.live,
-          format: MatchFormat.ipl,
-          startTime: DateTime.now(),
-          team1: const Team(
-            id: 'MI',
-            name: 'Mumbai Indians',
-            shortName: 'MI',
-            flagUrl:
-                'https://www.cricbuzz.com/a/img/v1/75x75/i1/c170661/mumbai-indians.jpg',
-            score: '178/4',
-            overs: '18.2',
-          ),
-          team2: const Team(
-            id: 'CSK',
-            name: 'Chennai Super Kings',
-            shortName: 'CSK',
-            flagUrl:
-                'https://www.cricbuzz.com/a/img/v1/75x75/i1/c170623/chennai-super-kings.jpg',
-            score: '175/8',
-            overs: '20.0',
-          ),
-          statusText: 'MI need 10 runs in 10 balls',
-        ),
-      ];
-    }
     return [];
   }
 
   List<Series> _getFallbackSeries() {
-    return [
-      const Series(
-        id: '7607',
-        name: 'IPL 2024',
-        startDate: 'Mar 22',
-        endDate: 'May 26',
-      ),
-      const Series(
-        id: '11253',
-        name: 'T20 World Cup 2026',
-        startDate: 'Jun 1',
-        endDate: 'Jun 29',
-      ),
-    ];
+    return [];
   }
 
   /// Get proper short name for a team based on common cricket team abbreviations

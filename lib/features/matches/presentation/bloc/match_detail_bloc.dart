@@ -157,18 +157,35 @@ class MatchDetailBloc extends Bloc<MatchDetailEvent, MatchDetailState> {
     var t1 = incoming.match.team1;
     var t2 = incoming.match.team2;
 
-    // Preserve Team 1 Flag
-    // If existing has a flag, PREFER it over the incoming one (which might be a scraped banner or empty)
-    if (existing.match.team1.flagUrl.isNotEmpty) {
-      t1 = t1.copyWith(flagUrl: existing.match.team1.flagUrl);
+    // Build a lookup of shortName → flagUrl from the existing (preview) teams.
+    // This ensures we match by team identity, NOT by position, so flags are
+    // never swapped when the API returns teams in a different order.
+    final existingFlags = <String, String>{};
+    final e1 = existing.match.team1;
+    final e2 = existing.match.team2;
+    if (e1.flagUrl.isNotEmpty) {
+      existingFlags[e1.shortName.toUpperCase()] = e1.flagUrl;
+      if (e1.id.isNotEmpty) existingFlags[e1.id] = e1.flagUrl;
+    }
+    if (e2.flagUrl.isNotEmpty) {
+      existingFlags[e2.shortName.toUpperCase()] = e2.flagUrl;
+      if (e2.id.isNotEmpty) existingFlags[e2.id] = e2.flagUrl;
     }
 
-    // Preserve Team 2 Flag
-    if (existing.match.team2.flagUrl.isNotEmpty) {
-      t2 = t2.copyWith(flagUrl: existing.match.team2.flagUrl);
+    // Apply the correct flag to each incoming team by matching short name or id
+    String? resolveFlag(Team t) {
+      return existingFlags[t.shortName.toUpperCase()] ??
+          existingFlags[t.id] ??
+          (t.flagUrl.isNotEmpty ? t.flagUrl : null);
     }
 
-    // Return new detail with updated teams
+    final f1 = resolveFlag(t1);
+    if (f1 != null) t1 = t1.copyWith(flagUrl: f1);
+
+    final f2 = resolveFlag(t2);
+    if (f2 != null) t2 = t2.copyWith(flagUrl: f2);
+
+    // Return new detail with correctly-flagged teams
     return incoming.copyWith(
       match: incoming.match.copyWith(team1: t1, team2: t2),
     );

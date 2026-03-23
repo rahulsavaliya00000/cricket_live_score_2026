@@ -232,4 +232,37 @@ class AppLocalizationsPa extends AppLocalizations {
 
   @override
   String get predictions => 'ਭਵਿੱਖਬਾਣੀਆਂ';
+
+  @override
+  String get spinAndWin => 'ਸਪਿਨ ਅਤੇ ਜਿੱਤੋ';
+
+  @override
+  String get spinAndWinSubtitle => 'ਰੋਜ਼ਾਨਾ ਇਨਾਮਾਂ ਲਈ ਕਿਸਮਤ ਅਜ਼ਮਾਓ';
+
+  @override
+  String get sendSuggestion => 'ਸੁਝਾਅ ਭੇਜੋ';
+
+  @override
+  String get helpUsImprove => 'CricketBuzz ਨੂੰ ਬਿਹਤਰ ਬਣਾਉਣ ਵਿੱਚ ਮਦਦ ਕਰੋ';
+
+  @override
+  String get setupGuestNickname => 'ਮਹਿਮਾਨ ਨਾਮ ਸੈੱਟ ਕਰੋ';
+
+  @override
+  String get updatingScores => 'ਸਕੋਰ ਅੱਪਡੇਟ ਹੋ ਰਹੇ ਹਨ...';
+
+  @override
+  String get tapBackToExit => 'ਬਾਹਰ ਜਾਣ ਲਈ ਫਿਰ ਬੈਕ ਦਬਾਓ';
+
+  @override
+  String get adFreeExperience => 'ਇਸ਼ਤਿਹਾਰ-ਮੁਕਤ ਅਨੁਭਵ';
+
+  @override
+  String get getLifetimeAccess => 'ਲਾਈਫਟਾਈਮ ਐਕਸੈਸ ਪਾਓ';
+
+  @override
+  String get maybeLater => 'ਬਾਅਦ ਵਿੱਚ';
+
+  @override
+  String get yetToBat => 'ਬੱਲੇਬਾਜ਼ੀ ਬਾਕੀ';
 }

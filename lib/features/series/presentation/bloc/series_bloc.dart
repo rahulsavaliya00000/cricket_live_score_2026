@@ -47,7 +47,7 @@ class SeriesState extends Equatable {
     this.seriesList = const [],
     this.filteredSeries = const [],
     this.selectedSeries,
-    this.selectedType,
+    this.selectedType = SeriesType.ipl,
     this.searchQuery = '',
     this.error,
   });
@@ -178,10 +178,10 @@ class SeriesBloc extends Bloc<SeriesEvent, SeriesState> {
         state.copyWithState(
           status: SeriesStatus.loaded,
           seriesList: sortedList,
-          filteredSeries: sortedList, // Initially show all
         ),
       );
-      // Re-apply any existing filters if needed (though usually load resets)
+      // Apply filters (which defaults to IPL now)
+      _applyFilters(emit);
     } catch (e) {
       emit(
         state.copyWithState(status: SeriesStatus.error, error: e.toString()),

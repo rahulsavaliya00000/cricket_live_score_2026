@@ -232,4 +232,37 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get predictions => 'ಭವಿಷ್ಯವಾಣಿಗಳು';
+
+  @override
+  String get spinAndWin => 'ಸ್ಪಿನ್ & ಗೆಲ್ಲಿ';
+
+  @override
+  String get spinAndWinSubtitle => 'ದೈನಂದಿನ ಬಹುಮಾನಗಳಿಗಾಗಿ ಅದೃಷ್ಟ ಪ್ರಯತ್ನಿಸಿ';
+
+  @override
+  String get sendSuggestion => 'ಸಲಹೆ ಕಳುಹಿಸಿ';
+
+  @override
+  String get helpUsImprove => 'CricketBuzz ಸುಧಾರಿಸಲು ಸಹಾಯ ಮಾಡಿ';
+
+  @override
+  String get setupGuestNickname => 'ಅತಿಥಿ ಹೆಸರು ಹೊಂದಿಸಿ';
+
+  @override
+  String get updatingScores => 'ಸ್ಕೋರ್‌ಗಳು ಅಪ್‌ಡೇಟ್ ಆಗುತ್ತಿವೆ...';
+
+  @override
+  String get tapBackToExit => 'ನಿರ್ಗಮಿಸಲು ಮತ್ತೆ ಬ್ಯಾಕ್ ಒತ್ತಿ';
+
+  @override
+  String get adFreeExperience => 'ಜಾಹೀರಾತು-ರಹಿತ ಅನುಭವ';
+
+  @override
+  String get getLifetimeAccess => 'ಜೀವಮಾನ ಪ್ರವೇಶ ಪಡೆಯಿರಿ';
+
+  @override
+  String get maybeLater => 'ನಂತರ';
+
+  @override
+  String get yetToBat => 'ಬ್ಯಾಟಿಂಗ್ ಬಾಕಿ ಇದೆ';
 }

@@ -232,4 +232,37 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get predictions => 'پیش گوئیاں';
+
+  @override
+  String get spinAndWin => 'سپن اور جیتیں';
+
+  @override
+  String get spinAndWinSubtitle => 'روزانہ انعامات کے لیے قسمت آزمائیں';
+
+  @override
+  String get sendSuggestion => 'تجویز بھیجیں';
+
+  @override
+  String get helpUsImprove => 'CricketBuzz کو بہتر بنانے میں مدد کریں';
+
+  @override
+  String get setupGuestNickname => 'مہمان نام ترتیب دیں';
+
+  @override
+  String get updatingScores => 'اسکور اپ ڈیٹ ہو رہے ہیں...';
+
+  @override
+  String get tapBackToExit => 'باہر جانے کے لیے پھر بیک دبائیں';
+
+  @override
+  String get adFreeExperience => 'اشتہار سے پاک تجربہ';
+
+  @override
+  String get getLifetimeAccess => 'لائف ٹائم رسائی حاصل کریں';
+
+  @override
+  String get maybeLater => 'بعد میں';
+
+  @override
+  String get yetToBat => 'بیٹنگ باقی ہے';
 }

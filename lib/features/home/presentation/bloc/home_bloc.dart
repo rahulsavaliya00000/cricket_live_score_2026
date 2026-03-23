@@ -85,7 +85,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(
         state.copyWith(
           status: HomeStatus.loaded,
-          liveMatches: results[0],
+          liveMatches: _prioritizeIpl(results[0]),
           upcomingMatches: results[1],
           recentMatches: results[2],
         ),
@@ -163,7 +163,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(
         state.copyWith(
           status: HomeStatus.loaded,
-          liveMatches: liveMatches,
+          liveMatches: _prioritizeIpl(liveMatches),
           upcomingMatches: upcomingMatches,
           recentMatches: recentMatches,
           isRefreshing: false,
@@ -201,6 +201,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // Extract first number (runs) before '/' or '-'
     final match = RegExp(r'(\d+)').firstMatch(score);
     return match != null ? int.tryParse(match.group(1)!) ?? 0 : 0;
+  }
+
+  List<CricketMatch> _prioritizeIpl(List<CricketMatch> matches) {
+    final iplMatches = matches.where((m) => m.format == MatchFormat.ipl).toList();
+    final otherMatches = matches.where((m) => m.format != MatchFormat.ipl).toList();
+    return [...iplMatches, ...otherMatches];
   }
 }
 

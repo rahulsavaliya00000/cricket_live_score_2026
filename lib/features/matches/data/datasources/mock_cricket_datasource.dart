@@ -572,6 +572,12 @@ class MockCricketDataSource implements CricketDataSource {
   }
 
   @override
+  Future<List<CricketTeam>> getSeriesSquads(String seriesId) async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    return [];
+  }
+
+  @override
   Future<List<Player>> getTeamPlayers(String teamSlug, String teamId) async {
     await Future.delayed(const Duration(milliseconds: 400));
     return _mockPlayers;
@@ -922,18 +928,7 @@ class MockCricketDataSource implements CricketDataSource {
       endDate: 'May 28, 2026',
       type: SeriesType.ipl,
       isFeatured: true,
-      teams: const [
-        'MI',
-        'CSK',
-        'RCB',
-        'KKR',
-        'DC',
-        'SRH',
-        'GT',
-        'LSG',
-        'RR',
-        'PBKS',
-      ],
+      teams: const ['RCB', 'KKR', 'DC', 'SRH', 'GT', 'LSG', 'RR', 'PBKS'],
     ),
     Series(
       id: 's_indaus',

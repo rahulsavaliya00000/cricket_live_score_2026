@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +17,7 @@ class ConnectivityWrapper extends StatefulWidget {
 class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
   bool _isConnected = true;
+  bool _isChecking = false;
 
   @override
   void initState() {
@@ -29,19 +31,39 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
   }
 
   Future<void> _checkInitialConnection() async {
+    setState(() => _isChecking = true);
     final results = await Connectivity().checkConnectivity();
-    _updateConnectionStatus(results);
+    await _updateConnectionStatus(results);
+    if (mounted) setState(() => _isChecking = false);
   }
 
-  void _updateConnectionStatus(List<ConnectivityResult> results) {
+  Future<void> _updateConnectionStatus(List<ConnectivityResult> results) async {
     // Specifically check if the ONLY result is none
     final isOffline =
         results.length == 1 && results.first == ConnectivityResult.none;
 
-    if (mounted) {
-      setState(() {
-        _isConnected = !isOffline;
-      });
+    if (isOffline) {
+      if (mounted) setState(() => _isConnected = false);
+      return;
+    }
+
+    // If connectivity says we are connected, verify actual internet reachability
+    try {
+      final lookup = await InternetAddress.lookup(
+        'google.com',
+      ).timeout(const Duration(seconds: 3));
+      final hasInternet = lookup.isNotEmpty && lookup[0].rawAddress.isNotEmpty;
+      if (mounted) {
+        setState(() {
+          _isConnected = hasInternet;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isConnected = false;
+        });
+      }
     }
   }
 
@@ -112,14 +134,23 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: Text(
-                            'Try Again',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+                          child: _isChecking
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  'Try Again',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
                     ],

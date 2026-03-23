@@ -232,4 +232,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get predictions => 'Predictions';
+
+  @override
+  String get spinAndWin => 'Spin & Win';
+
+  @override
+  String get spinAndWinSubtitle => 'Try your luck for daily rewards';
+
+  @override
+  String get sendSuggestion => 'Send a Suggestion';
+
+  @override
+  String get helpUsImprove => 'Help us improve CricketBuzz';
+
+  @override
+  String get setupGuestNickname => 'Setup Guest Nickname';
+
+  @override
+  String get updatingScores => 'Updating scores...';
+
+  @override
+  String get tapBackToExit => 'Tap back again to exit';
+
+  @override
+  String get adFreeExperience => 'Ad-Free Experience';
+
+  @override
+  String get getLifetimeAccess => 'Get Lifetime Access';
+
+  @override
+  String get maybeLater => 'Maybe later';
+
+  @override
+  String get yetToBat => 'Yet to bat';
 }

@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricketbuzz/core/utils/ad_helper.dart';
 import 'package:cricketbuzz/core/widgets/shimmer_loader.dart';
 import 'package:cricketbuzz/core/widgets/error_view.dart';
 import 'package:cricketbuzz/features/series/presentation/bloc/series_bloc.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
+import 'package:cricketbuzz/core/widgets/native_ad_widget.dart';
 
 class SeriesPage extends StatefulWidget {
   const SeriesPage({super.key});
@@ -85,9 +87,25 @@ class _SeriesPageState extends State<SeriesPage> {
                       isSelected: state.selectedType == null,
                       onSelected: (selected) {
                         if (selected) {
-                          context.read<SeriesBloc>().add(
-                            SelectSeriesType(null),
-                          );
+                          AdHelper.showInterstitialAd(() {
+                            context.read<SeriesBloc>().add(
+                              SelectSeriesType(null),
+                            );
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterChip(
+                      label: 'IPL',
+                      isSelected: state.selectedType == SeriesType.ipl,
+                      onSelected: (selected) {
+                        if (selected) {
+                          AdHelper.showInterstitialAd(() {
+                            context.read<SeriesBloc>().add(
+                              SelectSeriesType(SeriesType.ipl),
+                            );
+                          });
                         }
                       },
                     ),
@@ -98,9 +116,11 @@ class _SeriesPageState extends State<SeriesPage> {
                           state.selectedType == SeriesType.international,
                       onSelected: (selected) {
                         if (selected) {
-                          context.read<SeriesBloc>().add(
-                            SelectSeriesType(SeriesType.international),
-                          );
+                          AdHelper.showInterstitialAd(() {
+                            context.read<SeriesBloc>().add(
+                              SelectSeriesType(SeriesType.international),
+                            );
+                          });
                         }
                       },
                     ),
@@ -110,9 +130,11 @@ class _SeriesPageState extends State<SeriesPage> {
                       isSelected: state.selectedType == SeriesType.t20League,
                       onSelected: (selected) {
                         if (selected) {
-                          context.read<SeriesBloc>().add(
-                            SelectSeriesType(SeriesType.t20League),
-                          );
+                          AdHelper.showInterstitialAd(() {
+                            context.read<SeriesBloc>().add(
+                              SelectSeriesType(SeriesType.t20League),
+                            );
+                          });
                         }
                       },
                     ),
@@ -122,9 +144,25 @@ class _SeriesPageState extends State<SeriesPage> {
                       isSelected: state.selectedType == SeriesType.domestic,
                       onSelected: (selected) {
                         if (selected) {
-                          context.read<SeriesBloc>().add(
-                            SelectSeriesType(SeriesType.domestic),
-                          );
+                          AdHelper.showInterstitialAd(() {
+                            context.read<SeriesBloc>().add(
+                              SelectSeriesType(SeriesType.domestic),
+                            );
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterChip(
+                      label: 'Women',
+                      isSelected: state.selectedType == SeriesType.women,
+                      onSelected: (selected) {
+                        if (selected) {
+                          AdHelper.showInterstitialAd(() {
+                            context.read<SeriesBloc>().add(
+                              SelectSeriesType(SeriesType.women),
+                            );
+                          });
                         }
                       },
                     ),
@@ -148,9 +186,14 @@ class _SeriesPageState extends State<SeriesPage> {
                     }
                     return ListView.builder(
                       padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                      itemCount: seriesList.length,
+                      itemCount: seriesList.length + (seriesList.length ~/ 2),
                       itemBuilder: (context, index) {
-                        return _SeriesCard(series: seriesList[index]);
+                        if ((index + 1) % 3 == 0) {
+                          final adNumber = (index + 1) ~/ 3;
+                          return NativeAdWidget.forIndex(adNumber);
+                        }
+                        final seriesIndex = index - (index ~/ 3);
+                        return _SeriesCard(series: seriesList[seriesIndex]);
                       },
                     );
                   },
@@ -182,7 +225,7 @@ class _FilterChip extends StatelessWidget {
       label: Text(label),
       selected: isSelected,
       onSelected: onSelected,
-      selectedColor: Theme.of(context).primaryColor,
+      selectedColor: AppColors.primaryGreen,
       labelStyle: GoogleFonts.poppins(
         color: isSelected
             ? Colors.white
@@ -201,6 +244,13 @@ class _FilterChip extends StatelessWidget {
       ),
       showCheckmark: false,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      // Material 3 overrides selectedColor — use color to force correct styling
+      color: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return AppColors.primaryGreen;
+        }
+        return isDark ? const Color(0xFF1E1E1E) : Colors.grey[100];
+      }),
     );
   }
 }
@@ -233,7 +283,11 @@ class _SeriesCard extends StatelessWidget {
         break;
     }
     return GestureDetector(
-      onTap: () => context.push('/series-detail/${series.id}'),
+      onTap: () {
+        AdHelper.showInterstitialAd(() {
+          context.push('/series-detail/${series.id}');
+        });
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(16),

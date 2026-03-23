@@ -233,4 +233,38 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get predictions => 'கணிப்புகள்';
+
+  @override
+  String get spinAndWin => 'சுழற்று & வெல்லுங்கள்';
+
+  @override
+  String get spinAndWinSubtitle =>
+      'தினசரி பரிசுகளுக்கு அதிர்ஷ்டம் முயற்சிக்கவும்';
+
+  @override
+  String get sendSuggestion => 'யோசனை அனுப்பு';
+
+  @override
+  String get helpUsImprove => 'CricketBuzz ஐ மேம்படுத்த உதவுங்கள்';
+
+  @override
+  String get setupGuestNickname => 'விருந்தினர் பெயர் அமை';
+
+  @override
+  String get updatingScores => 'மதிப்பெண்கள் புதுப்பிக்கப்படுகின்றன...';
+
+  @override
+  String get tapBackToExit => 'வெளியேற மீண்டும் பேக் அழுத்தவும்';
+
+  @override
+  String get adFreeExperience => 'விளம்பரமற்ற அனுபவம்';
+
+  @override
+  String get getLifetimeAccess => 'வாழ்நாள் அணுகல் பெறுங்கள்';
+
+  @override
+  String get maybeLater => 'பிறகு';
+
+  @override
+  String get yetToBat => 'பேட்டிங் இன்னும் உள்ளது';
 }

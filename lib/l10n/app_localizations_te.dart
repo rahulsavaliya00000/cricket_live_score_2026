@@ -232,4 +232,37 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get predictions => 'అంచనాలు';
+
+  @override
+  String get spinAndWin => 'స్పిన్ & గెలవండి';
+
+  @override
+  String get spinAndWinSubtitle => 'రోజువారీ బహుమతుల కోసం అదృష్టం పరీక్షించండి';
+
+  @override
+  String get sendSuggestion => 'సూచన పంపండి';
+
+  @override
+  String get helpUsImprove => 'CricketBuzz మెరుగుపరచడంలో సహాయపడండి';
+
+  @override
+  String get setupGuestNickname => 'అతిథి పేరు సెట్ చేయండి';
+
+  @override
+  String get updatingScores => 'స్కోర్లు నవీకరిస్తున్నాయి...';
+
+  @override
+  String get tapBackToExit => 'నిష్క్రమించడానికి మళ్ళీ బ్యాక్ నొక్కండి';
+
+  @override
+  String get adFreeExperience => 'ప్రకటన-రహిత అనుభవం';
+
+  @override
+  String get getLifetimeAccess => 'జీవితకాల యాక్సెస్ పొందండి';
+
+  @override
+  String get maybeLater => 'తర్వాత';
+
+  @override
+  String get yetToBat => 'బ్యాటింగ్ మిగిలి ఉంది';
 }

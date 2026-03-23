@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rounded rectangle background for the app icon in notifications.
+     clipToOutline on ImageView clips the bitmap to this shape. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="10dp" />
+    <solid android:color="@android:color/transparent" />
+</shape>

@@ -28,10 +28,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -51,7 +48,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyATPbh9RQf_peg77rlUoOmCtO-3fzSy4hQ',
-    appId: '1:140223746923:android:e52ecbab9a315ea765b22e',
+    appId: '1:140223746923:android:84f61239d48fd51e65b22e',
     messagingSenderId: '140223746923',
     projectId: 'hack-the-tank',
     storageBucket: 'hack-the-tank.firebasestorage.app',
@@ -59,12 +56,24 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyD2d2wJLogsuiAgrrk51wN-_AuyTyWfiGI',
-    appId: '1:140223746923:ios:22fddf54192860c165b22e',
+    appId: '1:140223746923:ios:cfb2ae8795bc178465b22e',
     messagingSenderId: '140223746923',
     projectId: 'hack-the-tank',
     storageBucket: 'hack-the-tank.firebasestorage.app',
     androidClientId: '140223746923-15om8fotr173csrghjk7rai3dajesi2s.apps.googleusercontent.com',
-    iosClientId: '140223746923-7ck4saqtjb28cc22o0pe03fpjmh6e6om.apps.googleusercontent.com',
-    iosBundleId: 'com.example.cricketbuzz',
+    iosClientId: '140223746923-ik5th9ami9tulnqofu5t8l8d4e4fif0a.apps.googleusercontent.com',
+    iosBundleId: 'com.qdevix.cricketbuzz',
   );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyD2d2wJLogsuiAgrrk51wN-_AuyTyWfiGI',
+    appId: '1:140223746923:ios:cfb2ae8795bc178465b22e',
+    messagingSenderId: '140223746923',
+    projectId: 'hack-the-tank',
+    storageBucket: 'hack-the-tank.firebasestorage.app',
+    androidClientId: '140223746923-15om8fotr173csrghjk7rai3dajesi2s.apps.googleusercontent.com',
+    iosClientId: '140223746923-ik5th9ami9tulnqofu5t8l8d4e4fif0a.apps.googleusercontent.com',
+    iosBundleId: 'com.qdevix.cricketbuzz',
+  );
+
 }

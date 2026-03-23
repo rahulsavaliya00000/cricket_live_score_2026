@@ -4,12 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricketbuzz/core/utils/ad_helper.dart';
 import 'package:cricketbuzz/core/widgets/shimmer_loader.dart';
 import 'package:cricketbuzz/core/widgets/error_view.dart';
 import 'package:cricketbuzz/features/home/presentation/bloc/home_bloc.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
 import 'package:cricketbuzz/core/widgets/team_flag.dart';
 import 'package:cricketbuzz/core/widgets/empty_state_widget.dart';
+import 'package:cricketbuzz/core/widgets/native_ad_widget.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({super.key});
@@ -85,8 +87,11 @@ class _MatchesPageState extends State<MatchesPage>
                           ),
                         ),
                         selected: selected,
-                        onSelected: (_) =>
-                            setState(() => _selectedCategory = cat),
+                        onSelected: (_) {
+                          AdHelper.showInterstitialAd(() {
+                            setState(() => _selectedCategory = cat);
+                          });
+                        },
                         selectedColor: AppColors.primaryGreen,
                         checkmarkColor: Colors.white,
                         shape: RoundedRectangleBorder(
@@ -174,11 +179,21 @@ class _MatchList extends StatelessWidget {
         icon: emptyIcon ?? Icons.sports_cricket_outlined,
       );
     }
+    
+    final isPremium = AdHelper.isPremium;
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: matches.length,
+      itemCount: isPremium ? matches.length : matches.length + (matches.length ~/ 2),
       itemBuilder: (context, index) {
-        final match = matches[index];
+        if (!isPremium && (index + 1) % 3 == 0) {
+          final adNumber = (index + 1) ~/ 3; // 1st, 2nd, 3rd ad...
+          return NativeAdWidget.forIndex(adNumber);
+        }
+        final matchIndex = isPremium ? index : index - (index ~/ 3);
+        if (matchIndex >= matches.length) return const SizedBox.shrink();
+        
+        final match = matches[matchIndex];
         return _MatchCard(match: match);
       },
     );
@@ -193,7 +208,11 @@ class _MatchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
-      onTap: () => context.push('/match/${match.id}', extra: match),
+      onTap: () {
+        AdHelper.showInterstitialAd(() {
+          context.push('/match/${match.id}', extra: match);
+        });
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         padding: const EdgeInsets.all(14),
@@ -243,8 +262,8 @@ class _MatchCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
-                if (match.team1.score != null)
+                if (match.team1.score != null) ...[
+                  const SizedBox(width: 8),
                   Text(
                     match.team1.score!,
                     style: GoogleFonts.poppins(
@@ -254,6 +273,7 @@ class _MatchCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                ],
                 if (match.team1.overs != null) ...[
                   const SizedBox(width: 4),
                   Flexible(
@@ -286,8 +306,8 @@ class _MatchCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
-                if (match.team2.score != null)
+                if (match.team2.score != null) ...[
+                  const SizedBox(width: 8),
                   Text(
                     match.team2.score!,
                     style: GoogleFonts.poppins(
@@ -297,6 +317,7 @@ class _MatchCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                ],
                 if (match.team2.overs != null) ...[
                   const SizedBox(width: 4),
                   Flexible(

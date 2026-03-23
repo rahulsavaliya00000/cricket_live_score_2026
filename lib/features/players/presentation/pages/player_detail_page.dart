@@ -250,6 +250,8 @@ class _PlayerDetailPageState extends State<PlayerDetailPage> {
               children: [
                 Text(
                   player.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -258,6 +260,8 @@ class _PlayerDetailPageState extends State<PlayerDetailPage> {
                 ),
                 Text(
                   player.country,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: secondaryTextColor,
@@ -479,9 +483,9 @@ class _PlayerDetailPageState extends State<PlayerDetailPage> {
         .where((f) => statsMap.containsKey(f))
         .toList();
     // Add any others found
-    statsMap.keys.forEach((k) {
+    for (var k in statsMap.keys) {
       if (!availableFormats.contains(k)) availableFormats.add(k);
-    });
+    }
 
     if (availableFormats.isEmpty) return const SizedBox.shrink();
 
@@ -495,7 +499,7 @@ class _PlayerDetailPageState extends State<PlayerDetailPage> {
       scrollDirection: Axis.horizontal,
       child: DataTable(
         columnSpacing: 20,
-        headingRowColor: MaterialStateProperty.all(
+        headingRowColor: WidgetStateProperty.all(
           isDark ? Colors.white.withOpacity(0.05) : Colors.grey[50],
         ),
         columns: [
@@ -762,6 +766,8 @@ class _PlayerDetailPageState extends State<PlayerDetailPage> {
                     children: [
                       Text(
                         'vs ${perf.against}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,

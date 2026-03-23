@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Splash icon: pre-rounded PNG (12% corner radius baked in at build time).
+     Using a plain bitmap means no adaptive-icon masking or shape clipping issues. -->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@mipmap/splash_icon"
+    android:gravity="center" />

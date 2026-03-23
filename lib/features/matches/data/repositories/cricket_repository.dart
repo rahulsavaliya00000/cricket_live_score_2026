@@ -11,6 +11,7 @@ abstract class CricketRepository {
   Future<MatchDetail> getMatchDetail(String matchId);
   Future<List<BallCommentary>> getCommentary(String matchId);
   Future<List<CricketTeam>> getTeams();
+  Future<List<CricketTeam>> getSeriesSquads(String seriesId);
   Future<List<Player>> getTeamPlayers(String teamSlug, String teamId);
   Future<Player> getPlayerDetail(String id, String slug);
   Future<List<Series>> getSeries();
@@ -44,6 +45,10 @@ class CricketRepositoryImpl implements CricketRepository {
 
   @override
   Future<List<CricketTeam>> getTeams() => dataSource.getTeams();
+
+  @override
+  Future<List<CricketTeam>> getSeriesSquads(String seriesId) =>
+      dataSource.getSeriesSquads(seriesId);
 
   @override
   Future<List<Player>> getTeamPlayers(String teamSlug, String teamId) =>

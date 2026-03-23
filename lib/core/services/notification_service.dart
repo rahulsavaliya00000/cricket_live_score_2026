@@ -1,16 +1,39 @@
 import 'dart:math';
 import 'dart:io' show Platform;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cricketbuzz/core/router/app_router.dart';
+
+// ─── Native navigation channel (used by NotificationActionReceiver.kt) ───────
+const MethodChannel _navChannel = MethodChannel(
+  'com.qdevix.cricketbuzz/navigation',
+);
+
+// ─── Native notification channel (custom RemoteViews notification) ───────────
+const MethodChannel _notifChannel = MethodChannel(
+  'com.qdevix.cricketbuzz/notification',
+);
+
+/// Background notification tap handler — must be a top-level function.
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse details) {
+  // Background taps are handled when the app resumes via onDidReceiveNotificationResponse.
+  // No navigation here since no BuildContext is available.
+  debugPrint('🔔 Background notification action: ${details.actionId}');
+}
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
+
+  /// Set this from main.dart so tapping a notification can navigate
+  static GlobalKey<NavigatorState>? navigatorKey;
 
   static const String _enabledKey = 'notifications_enabled';
   static const int _dailyNotifId = 100;
@@ -60,7 +83,7 @@ class NotificationService {
     tz.initializeTimeZones();
 
     const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@drawable/ic_notif');
 
     const DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings(
@@ -77,23 +100,91 @@ class NotificationService {
     await _plugin.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse details) {
-        // Handle notification tap — nothing needed for now
+        if (details.payload == 'free_spin') {
+          final ctx =
+              rootNavigatorKey.currentContext ?? navigatorKey?.currentContext;
+          if (ctx == null) return;
+          if (details.actionId == 'live_score') {
+            // ignore: use_build_context_synchronously
+            GoRouter.of(ctx).go('/');
+          } else {
+            // 'spin_now' button OR tapping the notification body
+            // ignore: use_build_context_synchronously
+            GoRouter.of(ctx).go('/spin-wheel');
+          }
+        }
       },
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
 
-    // Create channel for Android
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    // Create channels for Android
+    const AndroidNotificationChannel dailyChannel = AndroidNotificationChannel(
       'daily_match_alerts',
       'Daily Match Alerts',
       description: 'Receive daily updates about live cricket matches',
       importance: Importance.max,
     );
 
-    await _plugin
+    const AndroidNotificationChannel spinChannel = AndroidNotificationChannel(
+      'free_spin_reminder',
+      'Free Spin Reminder',
+      description: 'Get notified when your daily free spin is ready',
+      importance: Importance.max,
+    );
+
+    final androidPlugin = _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(channel);
+        >();
+
+    await androidPlugin?.createNotificationChannel(dailyChannel);
+    await androidPlugin?.createNotificationChannel(spinChannel);
+
+    // ── Listen for navigation from NotificationActionReceiver when app is OPEN ──
+    // This handles the case where app is fully open (foreground).
+    // Background/killed start is handled by navigateFromLaunch() via SharedPreferences.
+    _navChannel.setMethodCallHandler((call) async {
+      if (call.method == 'navigate') {
+        final route = call.arguments as String?;
+        if (route == null) return;
+        _navigateNow(route);
+      }
+    });
+  }
+
+  /// Called from initState's postFrameCallback — reads the pending route
+  /// directly from SharedPreferences (written by Kotlin before startActivity).
+  /// No MethodChannel needed — works for all states: killed, background, open.
+  Future<void> navigateFromLaunch() async {
+    if (!Platform.isAndroid) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // Force a fresh read from disk (not the in-memory cache)
+      await prefs.reload();
+      final route = prefs.getString('pending_notification_route');
+      if (route == null || route.isEmpty) return;
+      // Clear it immediately so it doesn't replay on next launch
+      await prefs.remove('pending_notification_route');
+      debugPrint('🔔 navigateFromLaunch: $route');
+      _navigateNow(route);
+    } catch (e) {
+      debugPrint('⚠️ navigateFromLaunch error: $e');
+    }
+  }
+
+  /// Navigates immediately — only call when rootNavigatorKey.currentContext is ready.
+  void _navigateNow(String route) {
+    final ctx = rootNavigatorKey.currentContext ?? navigatorKey?.currentContext;
+    if (ctx == null) {
+      debugPrint('⚠️ _navigateNow: no context for $route');
+      return;
+    }
+    try {
+      GoRouter.of(ctx).go(route);
+      debugPrint('✅ Navigated to $route');
+    } catch (e) {
+      debugPrint('⚠️ Navigate error: $e');
+    }
   }
 
   Future<void> requestPermissions() async {
@@ -236,7 +327,7 @@ class NotificationService {
             channelDescription: 'Daily updates for cricket matches',
             importance: Importance.max,
             priority: Priority.high,
-            icon: '@mipmap/ic_launcher',
+            icon: '@drawable/ic_notif',
           ),
           iOS: DarwinNotificationDetails(
             presentAlert: true,
@@ -244,7 +335,7 @@ class NotificationService {
             presentSound: true,
           ),
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
       debugPrint(
         '📅 Notification scheduled for ${scheduledDate.hour}:${scheduledDate.minute.toString().padLeft(2, '0')}',
@@ -283,5 +374,211 @@ class NotificationService {
     }
 
     return scheduled;
+  }
+
+  /// Returns a TZDateTime for tomorrow morning between 8:00 AM and 11:00 AM.
+  /// Used to remind the user their free spin has reset overnight.
+  tz.TZDateTime _tomorrowMorning() {
+    final now = tz.TZDateTime.now(tz.local);
+    final hour = 8 + _random.nextInt(4); // 8, 9, 10, or 11 AM
+    final minute = _random.nextInt(60);
+    // Always tomorrow — regardless of current time
+    return tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day + 1,
+      hour,
+      minute,
+    );
+  }
+
+  // ─── Free Spin Sticky Notification ──────────────────────────
+
+  static const int _spinNotifId = 200;
+
+  /// Returns a different title every calendar day (cycles through 8 messages).
+  /// Uses day-of-year so it changes at midnight without any storage.
+  static const List<String> _spinTitles = [
+    '🎁 Free Daily Spin Available!',
+    '🎰 Your Spin Wheel is Ready!',
+    '🔥 Claim Your Free Spin Today!',
+    '🌀 Daily Spin Unlocked — Play Now!',
+    '✨ Lucky Spin Waiting for You!',
+    '🏏 Win Coins & Balls — Spin Now!',
+    '🎯 Don\'t Miss Your Free Daily Spin!',
+    '🎊 Free Spin Just Reset — Go Win!',
+  ];
+
+  String _dailySpinTitle() {
+    final now = DateTime.now();
+    final dayOfYear = now.difference(DateTime(now.year)).inDays;
+    return _spinTitles[dayOfYear % _spinTitles.length];
+  }
+
+  /// App theme primary green — used as the notification accent color.
+  static const int _spinColor = 0xFF00A86B; // primaryGreen
+
+  /// Returns the app's primary green color (constant, never rotates).
+  Color _dailySpinColor() => const Color(_spinColor);
+
+  Future<void> showStickySpinNotification() async {
+    // ── Android: use native RemoteViews notification with real styled buttons ──
+    if (Platform.isAndroid) {
+      try {
+        await _notifChannel.invokeMethod('showSpinNotification', {
+          'title': _dailySpinTitle(),
+          'body': 'Tap Spin Now to win coins, balls & bats!',
+          'color': _dailySpinColor().toARGB32(),
+        });
+        return;
+      } catch (e) {
+        debugPrint('⚠️ Native notification failed, falling back: $e');
+      }
+    }
+
+    // ── iOS (or Android fallback): flutter_local_notifications ────────────────
+    final tickers = [
+      '🎁 Free spin available — claim it now!',
+      '🔥 Your daily spin is waiting!',
+      '🌀 Spin the wheel & win rewards!',
+      '✨ Lucky spin ready — don\'t miss it!',
+    ];
+    final ticker = tickers[_random.nextInt(tickers.length)];
+
+    final androidDetails = AndroidNotificationDetails(
+      'free_spin_reminder',
+      'Free Spin Reminder',
+      channelDescription: 'Get notified when your daily free spin is ready',
+      importance: Importance.max,
+      priority: Priority.high,
+      ongoing: true,
+      autoCancel: false,
+      onlyAlertOnce: true,
+      ticker: ticker,
+      color: _dailySpinColor(),
+      styleInformation: BigTextStyleInformation(
+        '✨ Tap to spin the wheel and win coins, balls & bats!',
+        htmlFormatBigText: false,
+        contentTitle: _dailySpinTitle(),
+        htmlFormatContentTitle: false,
+        summaryText: '🏏 CricketBuzz',
+      ),
+      actions: <AndroidNotificationAction>[
+        AndroidNotificationAction(
+          'spin_now',
+          '🎰 Spin Now',
+          showsUserInterface: true,
+          cancelNotification: false,
+        ),
+        AndroidNotificationAction(
+          'live_score',
+          '🔴 Live Match',
+          showsUserInterface: true,
+          cancelNotification: false,
+        ),
+      ],
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: false,
+      presentSound: false,
+      interruptionLevel: InterruptionLevel.passive,
+      subtitle: 'Tap to claim your free daily spin!',
+    );
+
+    await _plugin.show(
+      id: _spinNotifId,
+      title: _dailySpinTitle(),
+      body: '✨ Tap to spin the wheel and win coins, balls & bats!',
+      notificationDetails: NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      ),
+      payload: 'free_spin',
+    );
+  }
+
+  Future<void> cancelSpinNotification() async {
+    if (Platform.isAndroid) {
+      try {
+        await _notifChannel.invokeMethod('cancelSpinNotification');
+        return;
+      } catch (_) {}
+    }
+    await _plugin.cancel(id: _spinNotifId);
+  }
+
+  /// Called when the app is backgrounded. Schedules a notification for
+  /// tomorrow morning so the user is reminded their free spin has reset,
+  /// even if they never reopen the app that day.
+  Future<void> scheduleSpinReminder() async {
+    final scheduledDate = _tomorrowMorning();
+
+    // NOTE: This is a scheduled (one-shot) alert — NOT ongoing.
+    // When the user taps it, the app opens and _onAppResumed / initState
+    // will call showStickySpinNotification() to post the real sticky then.
+    final androidDetails = AndroidNotificationDetails(
+      'free_spin_reminder',
+      'Free Spin Reminder',
+      channelDescription: 'Get notified when your daily free spin is ready',
+      importance: Importance.max,
+      priority: Priority.high,
+      ongoing:
+          false, // must be false — Android ignores ongoing on scheduled notifs
+      autoCancel: true, // dismisses itself when tapped
+      ticker: '🔥 Your free spin just reset — come claim it!',
+      color: _dailySpinColor(),
+      styleInformation: BigTextStyleInformation(
+        '🎰 Your free spin has reset — tap to claim it now!',
+        htmlFormatBigText: false,
+        contentTitle: _dailySpinTitle(),
+        htmlFormatContentTitle: false,
+        summaryText: '🏏 CricketBuzz',
+      ),
+      actions: <AndroidNotificationAction>[
+        AndroidNotificationAction(
+          'spin_now',
+          '🎰 Spin Now',
+          showsUserInterface: true,
+          cancelNotification: true, // dismiss this alert notif on tap
+        ),
+        AndroidNotificationAction(
+          'live_score',
+          '🔴 Live Match',
+          showsUserInterface: true,
+          cancelNotification: true,
+        ),
+      ],
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+      interruptionLevel: InterruptionLevel.active,
+      subtitle: 'Your free daily spin has reset — claim it!',
+    );
+
+    try {
+      await _plugin.zonedSchedule(
+        id: _spinNotifId,
+        title: _dailySpinTitle(),
+        body: '🎰 Your free spin has reset — tap to claim it now!',
+        scheduledDate: scheduledDate,
+        notificationDetails: NotificationDetails(
+          android: androidDetails,
+          iOS: iosDetails,
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: 'free_spin',
+      );
+      debugPrint(
+        '🎰 Spin Reminder scheduled for ${scheduledDate.hour}:${scheduledDate.minute.toString().padLeft(2, '0')}',
+      );
+    } catch (e) {
+      debugPrint('❌ Error scheduling spin reminder: $e');
+    }
   }
 }

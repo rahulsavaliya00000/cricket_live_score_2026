@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cricketbuzz/core/utils/ad_helper.dart';
+import 'package:cricketbuzz/core/widgets/native_ad_widget.dart';
 
 class TeamPlayersPage extends StatefulWidget {
   final String teamSlug;
@@ -196,10 +198,14 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
       grouped.putIfAbsent(p.role, () => []).add(p);
     }
 
+    final isPremium = AdHelper.isPremium;
     final sections = <Widget>[];
+    int sectionCount = 0;
+
     for (final role in roleOrder) {
       if (!grouped.containsKey(role) || grouped[role]!.isEmpty) continue;
       final rolePlayers = grouped[role]!;
+      sectionCount++;
 
       // Section header
       sections.add(
@@ -270,7 +276,9 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                   final slug =
                       player.slug ??
                       player.name.toLowerCase().replaceAll(' ', '-');
-                  context.push('/player/${player.id}/$slug');
+                  AdHelper.showInterstitialAdImmediately(() {
+                    context.push('/player/${player.id}/$slug');
+                  });
                 },
                 child: _PlayerCard(player: player),
               );
@@ -278,6 +286,18 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
           ),
         ),
       );
+
+      // Add Ad between sections if not premium
+      if (!isPremium && sectionCount % 2 == 0) {
+        sections.add(
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: NativeAdWidget(style: NativeAdStyle.small),
+            ),
+          ),
+        );
+      }
     }
 
     return sections;

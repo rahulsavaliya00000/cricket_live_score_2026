@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "CricketBuzz (Debug)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=flutter.inspector.structuredErrors=true"
+      ]
+    },
+    {
+      "name": "CricketBuzz (Profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "CricketBuzz (Release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    }
+  ]
+}

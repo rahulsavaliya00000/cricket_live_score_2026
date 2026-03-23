@@ -110,35 +110,35 @@ class CricketTeam extends Equatable {
           'https://static.cricbuzz.com/a/img/v1/72x54/i1/c776335/netherlands.jpg',
     ),
     CricketTeam(
-      id: '29',
+      id: '23',
       name: 'Scotland',
       slug: 'scotland',
       flagUrl:
           'https://static.cricbuzz.com/a/img/v1/72x54/i1/c776280/scotland.jpg',
     ),
     CricketTeam(
-      id: '575',
+      id: '72',
       name: 'Nepal',
       slug: 'nepal',
       flagUrl:
           'https://static.cricbuzz.com/a/img/v1/72x54/i1/c776331/nepal.jpg',
     ),
     CricketTeam(
-      id: '307',
+      id: '7',
       name: 'UAE',
       slug: 'united-arab-emirates',
       flagUrl:
           'https://static.cricbuzz.com/a/img/v1/72x54/i1/c776242/united-arab-emirates.jpg',
     ),
     CricketTeam(
-      id: '308',
+      id: '161',
       name: 'Namibia',
       slug: 'namibia',
       flagUrl:
           'https://static.cricbuzz.com/a/img/v1/72x54/i1/c776326/namibia.jpg',
     ),
     CricketTeam(
-      id: '72',
+      id: '15',
       name: 'USA',
       slug: 'united-states-of-america',
       flagUrl:
@@ -151,7 +151,7 @@ class CricketTeam extends Equatable {
       flagUrl: 'https://static.cricbuzz.com/a/img/v1/72x54/i1/c776328/oman.jpg',
     ),
     CricketTeam(
-      id: '28',
+      id: '26',
       name: 'Canada',
       slug: 'canada',
       flagUrl:

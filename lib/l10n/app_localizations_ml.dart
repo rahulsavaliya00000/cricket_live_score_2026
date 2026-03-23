@@ -232,4 +232,38 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get predictions => 'പ്രവചനങ്ങൾ';
+
+  @override
+  String get spinAndWin => 'സ്പിൻ & ജയിക്കൂ';
+
+  @override
+  String get spinAndWinSubtitle =>
+      'ദൈനംദിന സമ്മാനങ്ങൾക്കായി ഭാഗ്യം പരീക്ഷിക്കൂ';
+
+  @override
+  String get sendSuggestion => 'നിർദ്ദേശം അയക്കൂ';
+
+  @override
+  String get helpUsImprove => 'CricketBuzz മെച്ചപ്പെടുത്താൻ സഹായിക്കൂ';
+
+  @override
+  String get setupGuestNickname => 'ഗസ്റ്റ് പേര് സജ്ജമാക്കൂ';
+
+  @override
+  String get updatingScores => 'സ്കോറുകൾ അപ്ഡേറ്റ് ആകുന്നു...';
+
+  @override
+  String get tapBackToExit => 'പുറത്തുകടക്കാൻ വീണ്ടും ബാക്ക് അമർത്തൂ';
+
+  @override
+  String get adFreeExperience => 'പരസ്യമില്ലാത്ത അനുഭവം';
+
+  @override
+  String get getLifetimeAccess => 'ലൈഫ്ടൈം ആക്സസ് നേടൂ';
+
+  @override
+  String get maybeLater => 'പിന്നീട്';
+
+  @override
+  String get yetToBat => 'ബാറ്റിംഗ് ബാക്കി';
 }

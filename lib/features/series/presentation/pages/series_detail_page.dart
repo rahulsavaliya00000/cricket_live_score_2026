@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricketbuzz/core/utils/ad_helper.dart';
 import 'package:cricketbuzz/core/di/injection_container.dart';
 import 'package:cricketbuzz/core/widgets/error_view.dart';
 import 'package:cricketbuzz/core/widgets/shimmer_loader.dart';
 import 'package:cricketbuzz/features/series/presentation/bloc/series_bloc.dart';
 import 'package:cricketbuzz/features/series/domain/entities/series_entity.dart';
 import 'package:cricketbuzz/features/matches/domain/entities/match_entity.dart';
+import 'package:cricketbuzz/core/widgets/native_ad_widget.dart';
 
 class SeriesDetailPage extends StatelessWidget {
   final String seriesId;
@@ -127,11 +130,25 @@ class _MatchesTab extends StatelessWidget {
       );
     }
 
+    final isPremium = AdHelper.isPremium;
+
     return ListView.builder(
       padding: const EdgeInsets.all(12),
-      itemCount: series.matches.length,
+      itemCount: isPremium
+          ? series.matches.length
+          : series.matches.length + (series.matches.length ~/ 4),
       itemBuilder: (context, index) {
-        final match = series.matches[index];
+        if (!isPremium && (index + 1) % 5 == 0) {
+          final adIndex = (index + 1) ~/ 5;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: NativeAdWidget.forIndex(adIndex + 20), // Use unique offset
+          );
+        }
+        final matchIndex = isPremium ? index : index - (index ~/ 5);
+        if (matchIndex >= series.matches.length) return const SizedBox.shrink();
+
+        final match = series.matches[matchIndex];
         return _SeriesMatchCard(match: match);
       },
     );
@@ -147,7 +164,11 @@ class _SeriesMatchCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: () => context.push('/match/${match.id}', extra: match),
+      onTap: () {
+        AdHelper.showInterstitialAd(() {
+          context.push('/match/${match.id}', extra: match);
+        });
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -211,10 +232,37 @@ class _SeriesMatchCard extends StatelessWidget {
               score: match.team2.score,
               flagUrl: match.team2.flagUrl,
             ),
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(Icons.location_on_outlined, size: 12, color: Colors.grey),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    match.venue,
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Text(
+                  DateFormat('EEE, MMM d • h:mm a').format(match.startTime),
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
             if (match.result != null && match.result!.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const Divider(height: 1),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 match.result!,
                 style: GoogleFonts.poppins(

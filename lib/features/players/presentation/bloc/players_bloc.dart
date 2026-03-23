@@ -47,12 +47,20 @@ class LoadPlayerDetail extends PlayersEvent {
   List<Object?> get props => [playerId, playerSlug];
 }
 
+class LoadIplSquads extends PlayersEvent {
+  final String seriesId;
+  LoadIplSquads(this.seriesId);
+  @override
+  List<Object?> get props => [seriesId];
+}
+
 // ─── States ──────────────────────────────────────────────
 class PlayersState extends Equatable {
   final PlayersStatus status;
   final List<CricketTeam> teams;
   final List<CricketTeam> filteredTeams;
   final List<Player> teamPlayers;
+  final List<CricketTeam> iplTeams;
   final String? currentTeamName;
   final String? error;
 
@@ -61,6 +69,7 @@ class PlayersState extends Equatable {
     this.teams = const [],
     this.filteredTeams = const [],
     this.teamPlayers = const [],
+    this.iplTeams = const [],
     this.currentTeamName,
     this.selectedPlayer,
     this.error,
@@ -73,6 +82,7 @@ class PlayersState extends Equatable {
     List<CricketTeam>? teams,
     List<CricketTeam>? filteredTeams,
     List<Player>? teamPlayers,
+    List<CricketTeam>? iplTeams,
     String? currentTeamName,
     Player? selectedPlayer,
     String? error,
@@ -82,6 +92,7 @@ class PlayersState extends Equatable {
       teams: teams ?? this.teams,
       filteredTeams: filteredTeams ?? this.filteredTeams,
       teamPlayers: teamPlayers ?? this.teamPlayers,
+      iplTeams: iplTeams ?? this.iplTeams,
       currentTeamName: currentTeamName ?? this.currentTeamName,
       selectedPlayer: selectedPlayer ?? this.selectedPlayer,
       error: error,
@@ -94,6 +105,7 @@ class PlayersState extends Equatable {
     teams,
     filteredTeams,
     teamPlayers,
+    iplTeams,
     currentTeamName,
     selectedPlayer,
     error,
@@ -108,6 +120,8 @@ enum PlayersStatus {
   playersLoaded,
   loadingPlayer,
   playerLoaded,
+  loadingIplSquads,
+  iplSquadsLoaded,
   error,
 }
 
@@ -120,6 +134,7 @@ class PlayersBloc extends Bloc<PlayersEvent, PlayersState> {
     on<LoadTeamPlayers>(_onLoadTeamPlayers);
     on<SearchTeams>(_onSearchTeams);
     on<LoadPlayerDetail>(_onLoadPlayerDetail);
+    on<LoadIplSquads>(_onLoadIplSquads);
   }
 
   Future<void> _onLoadTeams(LoadTeams event, Emitter<PlayersState> emit) async {
@@ -191,6 +206,24 @@ class PlayersBloc extends Bloc<PlayersEvent, PlayersState> {
         state.copyWith(
           status: PlayersStatus.playerLoaded,
           selectedPlayer: player,
+        ),
+      );
+    } catch (e) {
+      emit(state.copyWith(status: PlayersStatus.error, error: e.toString()));
+    }
+  }
+
+  Future<void> _onLoadIplSquads(
+    LoadIplSquads event,
+    Emitter<PlayersState> emit,
+  ) async {
+    emit(state.copyWith(status: PlayersStatus.loadingIplSquads));
+    try {
+      final teams = await repository.getSeriesSquads(event.seriesId);
+      emit(
+        state.copyWith(
+          status: PlayersStatus.iplSquadsLoaded,
+          iplTeams: teams,
         ),
       );
     } catch (e) {

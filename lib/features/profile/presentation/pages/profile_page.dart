@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cricketbuzz/core/constants/app_colors.dart';
+import 'package:cricketbuzz/core/constants/app_constants.dart';
+import 'package:cricketbuzz/core/utils/ad_helper.dart';
 import 'package:cricketbuzz/l10n/app_localizations.dart';
 import 'package:cricketbuzz/core/theme/theme_bloc.dart';
 import 'package:cricketbuzz/features/auth/presentation/bloc/auth_bloc.dart';
@@ -75,19 +78,18 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () => context.push('/settings'),
+            onPressed: () {
+              AdHelper.showInterstitialAd(() {
+                context.push('/settings');
+              });
+            },
             icon: const Icon(Icons.settings_outlined),
           ),
         ],
       ),
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
-          if (state is! Authenticated) {
-            return Center(
-              child: Text('Please sign in', style: GoogleFonts.poppins()),
-            );
-          }
-          final user = state.user;
+          final user = state is Authenticated ? state.user : null;
 
           return BlocBuilder<ThemeBloc, ThemeState>(
             builder: (context, themeState) {
@@ -108,23 +110,39 @@ class _ProfilePageState extends State<ProfilePage> {
                         CircleAvatar(
                           radius: 40,
                           backgroundColor: Colors.white.withValues(alpha: 0.2),
-                          backgroundImage: user.photoUrl != null
-                              ? NetworkImage(user.photoUrl!)
-                              : null,
-                          child: user.photoUrl == null
-                              ? Text(
-                                  user.name[0].toUpperCase(),
+                          child: user?.photoUrl != null
+                              ? ClipOval(
+                                  child: CachedNetworkImage(
+                                    imageUrl: user!.photoUrl!,
+                                    fit: BoxFit.cover,
+                                    width: 80,
+                                    height: 80,
+                                    placeholder: (context, url) => const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation(Colors.white54),
+                                    ),
+                                    errorWidget: (context, url, error) => Text(
+                                      (user.name).isNotEmpty ? user.name[0].toUpperCase() : 'G',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  (user?.name ?? 'G')[0].toUpperCase(),
                                   style: GoogleFonts.poppins(
                                     fontSize: 30,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
-                                )
-                              : null,
+                                ),
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          user.name,
+                          user?.name ?? 'Guest User',
                           style: GoogleFonts.poppins(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -133,40 +151,84 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          user.email ?? 'Guest User',
+                          user?.email ?? 'Join the community',
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: Colors.white70,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            user.authType.name.toUpperCase(),
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                        if (user != null) ...[
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              user.authType.name.toUpperCase(),
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // ─── Login Options (If Guest) ──────────────
+                  if (state is! Authenticated) ...[
+                    Text(
+                      'Account Management',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () => context.push('/guest-name'),
+                        icon: const Icon(
+                          Icons.person_outline_rounded,
+                          size: 20,
+                        ),
+                        label: Text(
+                          AppLocalizations.of(context)!.setupGuestNickname,
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.primaryGreen,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                   // ─── Premium Section ──────────────
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () => context.push('/premium'),
+                      onTap: () {
+                        AdHelper.showInterstitialAd(() {
+                          context.push('/premium');
+                        });
+                      },
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
                         padding: const EdgeInsets.all(18),
@@ -244,7 +306,22 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
+                  // ─── Spin & Win Entry ──────────────
+                  if (AppConstants.devShowWalletUI)
+                    _ProfileMenuItem(
+                      icon: Icons.gesture_rounded,
+                      title: AppLocalizations.of(context)!.spinAndWin,
+                      subtitle: AppLocalizations.of(
+                        context,
+                      )!.spinAndWinSubtitle,
+                      onTap: () {
+                        AdHelper.showInterstitialAd(() {
+                          context.push('/spin-wheel');
+                        });
+                      },
+                    ),
+                  if (AppConstants.devShowWalletUI) const SizedBox(height: 8),
                   // ─── Menu Items ──────────────────
                   _ProfileMenuItem(
                     icon: Icons.language_rounded,
@@ -266,49 +343,59 @@ class _ProfilePageState extends State<ProfilePage> {
                   _ProfileMenuItem(
                     icon: Icons.privacy_tip_outlined,
                     title: AppLocalizations.of(context)!.privacyPolicy,
-                    onTap: () => context.push('/privacy'),
+                    onTap: () {
+                      AdHelper.showInterstitialAd(() {
+                        context.push('/privacy');
+                      });
+                    },
                   ),
                   _ProfileMenuItem(
                     icon: Icons.description_outlined,
                     title: AppLocalizations.of(context)!.termsAndConditions,
-                    onTap: () => context.push('/terms'),
+                    onTap: () {
+                      AdHelper.showInterstitialAd(() {
+                        context.push('/terms');
+                      });
+                    },
                   ),
                   _ProfileMenuItem(
                     icon: Icons.info_outline_rounded,
                     title: AppLocalizations.of(context)!.aboutApp,
-                    subtitle: 'Version 1.0.0',
+                    subtitle: 'Version ${AppConstants.appVersion}',
                     onTap: () {},
                   ),
                   const SizedBox(height: 16),
-                  // ─── Logout ──────────────────────
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: OutlinedButton.icon(
-                      onPressed: () =>
-                          context.read<AuthBloc>().add(SignOutRequested()),
-                      icon: const Icon(
-                        Icons.logout_rounded,
-                        color: AppColors.liveRed,
-                      ),
-                      label: Text(
-                        AppLocalizations.of(context)!.logout,
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w500,
+                  // ─── Logout (Only if Authenticated) ──────────────────────
+                  if (state is Authenticated) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            context.read<AuthBloc>().add(SignOutRequested()),
+                        icon: const Icon(
+                          Icons.logout_rounded,
                           color: AppColors.liveRed,
                         ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: AppColors.liveRed.withValues(alpha: 0.3),
+                        label: Text(
+                          AppLocalizations.of(context)!.logout,
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.liveRed,
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: AppColors.liveRed.withValues(alpha: 0.3),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                  ],
                   // ─── Inline Suggestion Box ─────────
                   Container(
                     padding: const EdgeInsets.all(18),
@@ -346,14 +433,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Send a Suggestion',
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.sendSuggestion,
                                     style: GoogleFonts.poppins(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   Text(
-                                    'Help us improve CricketBuzz',
+                                    AppLocalizations.of(context)!.helpUsImprove,
                                     style: GoogleFonts.poppins(
                                       fontSize: 11,
                                       color: isDark
@@ -455,6 +544,20 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 32),
+                  // ─── App Version Footer ────────────
+                  Center(
+                    child: Text(
+                      'CricketBuzz v${AppConstants.appVersion}',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 24),
                 ],
               );
@@ -466,9 +569,15 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showLanguageDialog(BuildContext context, Locale currentLocale) {
+    // Capture the bloc reference BEFORE entering the dialog builder,
+    // so the dialog's own BuildContext (which may not have ThemeBloc)
+    // doesn't cause a lookup failure — and the locale change propagates
+    // to the root MaterialApp.router immediately.
+    final themeBloc = context.read<ThemeBloc>();
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(
           'Select Language',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
@@ -485,14 +594,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   activeColor: AppColors.primaryGreen,
                   onChanged: (val) {
                     if (val != null) {
-                      context.read<ThemeBloc>().add(ChangeLocale(Locale(val)));
-                      Navigator.pop(context);
+                      themeBloc.add(ChangeLocale(Locale(val)));
+                      Navigator.pop(dialogContext);
                     }
                   },
                 ),
                 onTap: () {
-                  context.read<ThemeBloc>().add(ChangeLocale(Locale(e.key)));
-                  Navigator.pop(context);
+                  themeBloc.add(ChangeLocale(Locale(e.key)));
+                  Navigator.pop(dialogContext);
                 },
               );
             }).toList(),

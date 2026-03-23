@@ -29,7 +29,9 @@ class _GuestNamePageState extends State<GuestNamePage> {
 
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthError) {
+        if (state is Authenticated) {
+          context.go('/home');
+        } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -58,13 +60,7 @@ class _GuestNamePageState extends State<GuestNamePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    IconButton(
-                      onPressed: () => context.go('/login'),
-                      icon: const Icon(
-                        Icons.arrow_back_rounded,
-                        color: Colors.white,
-                      ),
-                    ),
+                    const SizedBox(height: 72), // Added spacing to compensate for removed back button
                     const Spacer(flex: 2),
                     Center(
                       child: Container(

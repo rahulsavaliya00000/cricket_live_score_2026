@@ -36,7 +36,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Effective Date: October 26, 2023',
+              'Last Updated: Feb 27, 2026',
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: textColor.withValues(alpha: 0.6),
@@ -45,33 +45,67 @@ class PrivacyPolicyPage extends StatelessWidget {
             const SizedBox(height: 24),
             _sectionTitle('1. Information We Collect', textColor),
             _paragraph(
-              'We collect minimal information to provide you with the best cricket experience. This includes:\n\n• Device Information: To optimize app performance.\n• Usage Data: To understand how you interact with our features.\n• Location (Optional): To provide localized match timings.',
+              'CricketBuzz collects only the minimum information needed to provide a great cricket experience:\n\n'
+              '• Account Information: Name and email address when you sign in with Google.\n'
+              '• Device Information: Device model and OS version to optimise app performance.\n'
+              '• Usage Data: Pages visited and features used, collected anonymously to help us improve the app.\n'
+              '• Notification Token: To deliver cricket score alerts you have opted into.',
               textColor,
             ),
             _sectionTitle('2. How We Use Your Data', textColor),
             _paragraph(
-              'Your data is used solely to:\n\n• Deliver real-time scores and updates.\n• Personalize your feed based on favorite teams.\n• Improve app stability and performance.',
+              'Your data is used only to:\n\n'
+              '• Deliver live cricket scores, match updates, and breaking news.\n'
+              '• Save your preferences such as favourite teams and display language.\n'
+              '• Send optional push notifications for matches you follow.\n'
+              '• Improve app stability, fix bugs, and develop new features.\n\n'
+              'We do not sell, rent, or share your personal data with third parties for marketing purposes.',
               textColor,
             ),
-            _sectionTitle('3. Data Security', textColor),
+            _sectionTitle('3. No Real-Money or Gambling Activities', textColor),
             _paragraph(
-              'We implement industry-standard security measures to protect your personal information. Your data is encrypted in transit and at rest.',
+              'CricketBuzz is a free cricket scores and news app. It does not involve any real-money transactions, betting, wagering, or gambling of any kind.\n\n'
+              'Any in-app rewards (coins, collectibles) are purely virtual, have no monetary value, cannot be exchanged for real money or prizes, and are provided solely for entertainment within the app.',
               textColor,
             ),
-            _sectionTitle('4. Third-Party Services', textColor),
+            _sectionTitle('4. Advertising', textColor),
             _paragraph(
-              'We may use trusted third-party services (like Google Firebase) for authentication and analytics. These services adhere to strict privacy standards.',
+              'We display non-personalised advertisements through Google AdMob to keep the app free. These ads do not use sensitive personal data. You can remove all ads by upgrading to CricketBuzz Premium.',
               textColor,
             ),
-            _sectionTitle('5. Contact Us', textColor),
+            _sectionTitle('5. Data Security', textColor),
             _paragraph(
-              'If you have any questions about this Privacy Policy, please contact us at support@cricketbuzz.com.',
+              'We implement industry-standard security measures including HTTPS encryption in transit and secure cloud storage via Google Firebase. We regularly review our practices to protect your information.',
+              textColor,
+            ),
+            _sectionTitle('6. Third-Party Services', textColor),
+            _paragraph(
+              'The app uses the following trusted third-party services, each governed by their own privacy policies:\n\n'
+              '• Google Firebase — authentication & database\n'
+              '• Google AdMob — advertising\n'
+              '• RevenueCat — subscription management\n\n'
+              'None of these services receive your data for advertising profiling.',
+              textColor,
+            ),
+            _sectionTitle('7. Children\'s Privacy', textColor),
+            _paragraph(
+              'CricketBuzz is not directed at children under 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us and we will delete it promptly.',
+              textColor,
+            ),
+            _sectionTitle('8. Your Rights', textColor),
+            _paragraph(
+              'You may request access to, correction of, or deletion of your personal data at any time by contacting us. You can also delete your account directly from the Profile page.',
+              textColor,
+            ),
+            _sectionTitle('9. Contact Us', textColor),
+            _paragraph(
+              'If you have questions about this Privacy Policy, please contact us at:\n\nqdevix@gmail.com',
               textColor,
             ),
             const SizedBox(height: 40),
             Center(
               child: Text(
-                '© 2024 CricketBuzz. All rights reserved.',
+                '© 2026 CricketBuzz. All rights reserved.',
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   color: textColor.withValues(alpha: 0.4),
